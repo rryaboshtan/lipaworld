@@ -1,0 +1,42 @@
+.cartHolder {
+  width: 130px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.cart {
+  background-color: #0fbc49;
+  color: #ffffff;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  height: 36px;
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.cartAdded {
+  background-color: #ffffff;
+  color: darkslategrey;
+  padding: 4px 8px;
+  border: 1px solid darkslategrey;
+  border-radius: 4px;
+  height: 36px;
+  cursor: pointer;
+  min-width: 100px;
+  margin: 8px;
+}
+
+.cart:active {
+  background-color: #0fbc3dc7;
+  color: #fff;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  height: 35px;
+  box-shadow: 0 0 0 0.1rem #0b6d25c7;
+  cursor: pointer;
+}
