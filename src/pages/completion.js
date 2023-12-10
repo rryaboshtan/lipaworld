@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import dotenv from 'dotenv';
 import axios from 'axios';
@@ -11,7 +11,7 @@ import NavMobile from '../components/navMobile/NavMobile';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
-import mixpanel from "mixpanel-browser";
+import mixpanel from 'mixpanel-browser';
 dotenv.config();
 
 export default function Completion(props) {
@@ -19,11 +19,13 @@ export default function Completion(props) {
 
   let cart = null;
   let recipients = null;
+  let payment = null;
 
   if (typeof window !== 'undefined') {
     if (!cart || !recipients) {
       cart = JSON.parse(sessionStorage.getItem('cart'));
       recipients = JSON.parse(sessionStorage.getItem('recipients'));
+      payment = JSON.parse(sessionStorage.getItem('payment'));
     }
   }
 
@@ -119,42 +121,12 @@ export default function Completion(props) {
   };
 
   useEffect(() => {
-    if (!stripePromise) return;
+    if (!payment) return;
 
-    stripePromise.then(async (stripe) => {
-      const url = new URL(window.location);
-      const clientSecret = url.searchParams.get('payment_intent_client_secret');
-      const { error, paymentIntent } = await stripe.retrievePaymentIntent(
-        clientSecret
-      );
-      setIntentStatus(paymentIntent.status);
-      setMessageBody(
-        error ? (
-          `${error.message}`
-        ) : (
-          <>
-            <strong>
-              Payment of {paymentIntent.currency.toUpperCase()}
-              {(paymentIntent.amount / 100).toFixed(2)} {paymentIntent.status}.
-            </strong>
-            <br />
-            <br />
-          </>
-        )
-      );
-    });
-  }, [stripePromise]);
-
-  useEffect(() => {
-    if (!intentStatus) {
-      setMessageBody(<>Verifying payment ...</>);
-      return;
-    }
-
-    if (intentStatus === 'succeeded') {
-      setMessageBody(<>Payment {intentStatus}.</>);
+    if (payment.purchase_units[0].payments.captures[0].status === 'COMPLETED') {
+      setIntentStatus('succeeded');
       mixpanel.track(`Successful Payment`);
-      
+
       voucherHandler();
       setVoucherMessageBody(
         <p>
@@ -162,12 +134,66 @@ export default function Completion(props) {
           &apos;s voucher. Hold on tight ...
         </p>
       );
+
+      setMessageBody(
+        <>
+          <strong>
+            Payment of {payment.purchase_units[0].amount.currency_code}
+            {Number(payment.purchase_units[0].amount.value).toFixed(2)}{' '}
+            succeeded.
+          </strong>
+          <br />
+          <br />
+        </>
+      );
     }
-  }, [intentStatus]);
+
+    // stripePromise.then(async (stripe) => {
+    //   const url = new URL(window.location);
+    //   const clientSecret = url.searchParams.get('payment_intent_client_secret');
+    //   const { error, paymentIntent } = await stripe.retrievePaymentIntent(
+    //     clientSecret
+    //   );
+    //   setIntentStatus(paymentIntent.status);
+    //   setMessageBody(
+    //     error ? (
+    //       `${error.message}`
+    //     ) : (
+    //       <>
+    //         <strong>
+    //           Payment of {paymentIntent.currency.toUpperCase()}
+    //           {(paymentIntent.amount / 100).toFixed(2)} {paymentIntent.status}.
+    //         </strong>
+    //         <br />
+    //         <br />
+    //       </>
+    //     )
+    //   );
+    // });
+  }, []);
+
+  // useEffect(() => {
+  //   if (!intentStatus) {
+  //     setMessageBody(<>Verifying payment ...</>);
+  //     return;
+  //   }
+
+  //   if (intentStatus === 'succeeded') {
+  //     setMessageBody(<>Payment {intentStatus}.</>);
+  //     mixpanel.track(`Successful Payment`);
+
+  //     voucherHandler();
+  //     setVoucherMessageBody(
+  //       <p>
+  //         Processing {recipients[0].name} {recipients[0].surname}
+  //         &apos;s voucher. Hold on tight ...
+  //       </p>
+  //     );
+  //   }
+  // }, [intentStatus]);
 
   const sendWhatsAppMessage = () => {
     mixpanel.track(`Sent WhatsApp message to a recipient with voucher`);
-    
     const cartItems = vouchers.map((item) => {
       const description = document.createElement('div');
       description.innerHTML = item.deal.voucherDescription;
@@ -204,12 +230,7 @@ export default function Completion(props) {
 
   const sendSmsMessage = () => {
     mixpanel.track(`Sent sms to a recipient with voucher`);
-    
-    const cartItems = vouchers.map((item) => {
-      const description = document.createElement('div');
-      description.innerHTML = item.deal.voucherDescription;
       const termsAndConditions = document.createElement('div');
-      termsAndConditions.innerHTML = item.deal.termsAndConditions;
 
       return `
         ${item.quantity} x ${item.deal.redemptionCurrency}${(
@@ -222,7 +243,7 @@ export default function Completion(props) {
         
         Description: ${description.innerText}
       `;
-    });
+    };
 
     const message = `Congratulations ${recipients[0].name} ${
       recipients[0].surname
@@ -248,6 +269,16 @@ export default function Completion(props) {
     }
     return 'messages'
   }, [intentStatus])
+
+  const getMessageBodyId = useMemo(() => {
+    if (intentStatus === 'succeeded') {
+      return 'succeeded_message';
+    }
+    if (!!intentStatus && intentStatus !== 'succeeded') {
+      return 'error_message';
+    }
+    return 'messages';
+  }, [intentStatus]);
 
   return (
     <main className={`${montserrat.className} ${styles.main}`}>
@@ -297,7 +328,7 @@ export default function Completion(props) {
             {isMobile && (
               <input
                 type='button'
-                id="sendSmsId"
+                id='sendSmsId'
                 className={styles.actionButton}
                 value='Share Voucher PIN on SMS'
                 onClick={sendSmsMessage}

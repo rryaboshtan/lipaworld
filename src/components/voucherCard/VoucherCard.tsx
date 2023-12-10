@@ -1,24 +1,30 @@
-import React, {Dispatch, SetStateAction, useState} from 'react';
-import styles from "./VoucherCard.module.scss";
-import {IVoucher} from "@/types";
-import CartButtons from "@components/cartButtons/CartButtons";
-import {TextField} from "@mui/material";
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import styles from './VoucherCard.module.scss';
+import { IVoucher } from '@/types';
+import CartButtons from '@components/cartButtons/CartButtons';
+import { TextField } from '@mui/material';
 
 interface Props {
-  voucher: IVoucher
-  setErrorMessage: Dispatch<SetStateAction<string | null>>
-  currencyRate: number
-  voucherQuantity: number
-  isHistory?: boolean
+  voucher: IVoucher;
+  setErrorMessage: Dispatch<SetStateAction<string | null>>;
+  currencyRate: number;
+  voucherQuantity: number;
+  isHistory?: boolean;
 }
 
-const VoucherCard: React.FC<Props> = ({voucher, isHistory, setErrorMessage, voucherQuantity = 1, currencyRate}) => {
+const VoucherCard: React.FC<Props> = ({
+  voucher,
+  isHistory,
+  setErrorMessage,
+  voucherQuantity = 1,
+  currencyRate,
+}) => {
   const [quantity, setQuantity] = useState(voucherQuantity);
-  
-  const resendCartHandler = () => {
-    
-  }
-  
+
+  // const resendCartHandler = () => {
+
+  // }
+
   return (
     <div
       className={styles.container}
@@ -34,9 +40,7 @@ const VoucherCard: React.FC<Props> = ({voucher, isHistory, setErrorMessage, vouc
           marginTop: '170px',
         }}
       >
-        <div className={styles.dealVoucherName}>
-          {voucher.voucherName}
-        </div>
+        <div className={styles.dealVoucherName}>{voucher.voucherName}</div>
         <div className={styles.amountRedemption}>
           <strong>
             {voucher.redemptionCurrency}
@@ -44,14 +48,9 @@ const VoucherCard: React.FC<Props> = ({voucher, isHistory, setErrorMessage, vouc
             {'   '}
           </strong>
           <span className={styles.amountPurchase}>
-                        (USD{' '}
-            {(
-              voucher.redemptionValues[0] /
-              100 /
-              currencyRate
-            ).toFixed(2)}
+            (USD {(voucher.redemptionValues[0] / 100 / currencyRate).toFixed(2)}
             )
-                      </span>
+          </span>
         </div>
         <div className={styles.amountRedemptionj}>
           {voucher.voucherDescription}
@@ -62,7 +61,7 @@ const VoucherCard: React.FC<Props> = ({voucher, isHistory, setErrorMessage, vouc
       </div>
       {isHistory ? (
         <>
-        <div className={styles.dealMerchant}>Quantity: {voucherQuantity}</div>
+          <div className={styles.dealMerchant}>Quantity: {voucherQuantity}</div>
           <CartButtons
             deal={voucher}
             setErrorMessage={setErrorMessage}
@@ -70,18 +69,17 @@ const VoucherCard: React.FC<Props> = ({voucher, isHistory, setErrorMessage, vouc
             isHistory={isHistory}
           />
         </>
-        
       ) : (
         <>
           <TextField
-            id="outlined-number"
-            label="Quantity"
-            type="number"
-            size="small"
+            id='outlined-number'
+            label='Quantity'
+            type='number'
+            size='small'
             value={quantity}
             onChange={(e) => setQuantity(+e.target.value)}
             sx={{
-              marginTop: "16px"
+              marginTop: '16px',
             }}
           />
           <CartButtons

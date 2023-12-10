@@ -23,7 +23,7 @@ import { Montserrat } from 'next/font/google';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
-import mixpanel from "mixpanel-browser";
+import mixpanel from 'mixpanel-browser';
 
 export default function CartContainer() {
   const router = useRouter();
@@ -305,7 +305,7 @@ export default function CartContainer() {
     }
 
     if (name) {
-      mixpanel.track(`Voucher Purchase Initiated`);      
+      mixpanel.track(`Voucher Purchase Initiated`);
       router.push(`/payment`);
     }
   };
@@ -355,6 +355,7 @@ export default function CartContainer() {
                   />
                 )}
               </div>
+
               <div
                 className={styles.contentFooter}
                 style={{
@@ -364,12 +365,14 @@ export default function CartContainer() {
                 }}
               >
                 {cart && cart?.cartItems.length > 0 && (
-                  <input
-                    className={`${styles.actionButton} ${styles.mediumEmphasis}`}
-                    value='Proceed to Checkout'
-                    type='button'
-                    onClick={checkoutHandler}
-                  />
+                  <>
+                    <input
+                      className={`${styles.actionButton} ${styles.mediumEmphasis}`}
+                      value='Proceed to Checkout'
+                      type='button'
+                      onClick={checkoutHandler}
+                    />
+                  </>
                 )}
               </div>
             </div>

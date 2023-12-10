@@ -9,7 +9,7 @@ import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
-import VoucherCard from "@components/voucherCard/VoucherCard";
+import VoucherCard from '@components/voucherCard/VoucherCard';
 
 export default function SelectDeal() {
   const router = useRouter();
@@ -127,11 +127,13 @@ export default function SelectDeal() {
 
             <div className={styles.dealHolder}>
               {filteredVouchers.map((voucher, index) => (
-                <VoucherCard 
-                  key={index} 
-                  voucher={voucher} 
+                <VoucherCard
+                  voucherQuantity={1}
+                  key={index}
+                  voucher={voucher}
                   currencyRate={currencyRate}
-                  setErrorMessage={setErrorMessage} />               
+                  setErrorMessage={setErrorMessage}
+                />
               ))}
             </div>
           </div>

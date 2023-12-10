@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { useRouter } from 'next/router';
 import Img from 'next/image';
 import { getUser } from '../services/AuthService';
+import { CreateOrderActions } from '@paypal/paypal-js';
 import {
   useVouchers,
   useCountries,
@@ -12,10 +13,11 @@ import {
 } from '@/context';
 import Nav from '../components/nav/Nav';
 import NavMobile from '../components/navMobile/NavMobile';
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
 
 import { Montserrat } from 'next/font/google';
-import { Elements } from '@stripe/react-stripe-js';
-import CheckoutForm from '../components/checkoutForm/CheckoutForm';
+// import { Elements } from '@stripe/react-stripe-js';
+// import CheckoutForm from '../components/checkoutForm/CheckoutForm';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
@@ -23,10 +25,10 @@ import styles from '../styles/page.module.css';
 dotenv.config();
 
 export default function Payment(props: any) {
+  const [{ options, isPending }, dispatch] = usePayPalScriptReducer();
+
   const router = useRouter();
   const transaction = useTransaction();
-  const { stripePromise } = props;
-  const [clientSecret, setClientSecret] = useState('');
   const [intentSent, setIntentSent] = useState(false);
   const user = getUser();
   const name = user !== 'undefined' && user ? user.name : '';
@@ -107,60 +109,95 @@ export default function Payment(props: any) {
   //   transactionId,
   // ]);
 
-  useEffect(() => {
-    if (
-      transaction &&
-      transaction.cartTotalAmount &&
-      transaction.transactionId &&
-      !intentSent
-    ) {
-      console.log('start intent - amount', transaction.cartTotalAmount);
-      const requestOptions: RequestInit = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount: !transaction.cartTotalAmount
-            ? 1
-            : Number(transaction.cartTotalAmount) * 100,
-          currency: 'USD',
-          description: 'LIPAWORLD VOUCHERS',
-          metadata: {
-            transaction_id: transaction.transactionId ?? 't',
-            cart_id: cart?.cartId || provisionalCartId,
-            sender_id: user.id ?? 'u',
-            recipient_id: transaction.recipientIds[0] ?? 'r',
-            amount: Number(transaction.cartTotalAmount) * 100,
+  // useEffect(() => {
+  //   if (
+  //     transaction &&
+  //     transaction.cartTotalAmount &&
+  //     transaction.transactionId &&
+  //     !intentSent
+  //   ) {
+  //     console.log('start intent - amount', transaction.cartTotalAmount);
+  //     const requestOptions: RequestInit = {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         amount: !transaction.cartTotalAmount
+  //           ? 1
+  //           : Number(transaction.cartTotalAmount) * 100,
+  //         currency: 'USD',
+  //         description: 'LIPAWORLD VOUCHERS',
+  //         metadata: {
+  //           transaction_id: transaction.transactionId ?? 't',
+  //           cart_id: cart?.cartId || provisionalCartId,
+  //           sender_id: user.id ?? 'u',
+  //           recipient_id: transaction.recipientIds[0] ?? 'r',
+  //           amount: Number(transaction.cartTotalAmount) * 100,
+  //         },
+  //       }),
+  //     };
+  //     fetch(
+  //       `${process.env.NEXT_PUBLIC_STRIPE_API_URL}/create-payment-intent`,
+  //       requestOptions
+  //     )
+  //       .then((res) => res.json())
+  //       .then(({ clientSecret }) => {
+  //         setClientSecret(clientSecret);
+  //         setIntentSent(true);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   } else {
+  //     console.log(transaction);
+  //   }
+  // }, []);
+
+  const onCreateOrder = (data: any, actions: any) => {
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            value: Number(transaction?.cartTotalAmount) ?? 800.99,
           },
-        }),
-      };
-      fetch(
-        `${process.env.NEXT_PUBLIC_STRIPE_API_URL}/create-payment-intent`,
-        requestOptions
-      )
-        .then((res) => res.json())
-        .then(({ clientSecret }) => {
-          setClientSecret(clientSecret);
-          setIntentSent(true);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.log(transaction);
-    }
-  }, []);
+        },
+      ],
+    });
+  };
+
+  const onApproveOrder = (data: any, actions: any) => {
+    return actions.order.capture().then((details: any) => {
+      sessionStorage.setItem('payment', JSON.stringify(details));
+      // sessionStorage.removeItem('cart');
+      // sessionStorage.removeItem('cartTotalAmount');
+      // const name = details.payer.name.given_name;
+      // alert(`Transaction completed by ${name}`);
+      console.log(
+        'details',
+        details.purchase_units[0].payments.captures[0].status
+      );
+      router.push(`/completion?id=${details.id}`);
+    });
+  };
 
   return (
     <main className={`${montserrat.className} ${styles.main}`}>
       <NavMobile />
 
       <div className={styles.contentBody}>
-        {clientSecret && stripePromise ? (
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
-            <CheckoutForm user={user} />
-          </Elements>
+        {isPending ? (
+          <p>LOADING...</p>
         ) : (
-          <div>Loading...</div>
+          <>
+            <div>
+              Pay now
+              <br />
+            </div>
+            <PayPalButtons
+              style={{ layout: 'vertical' }}
+              createOrder={(data, actions) => onCreateOrder(data, actions)}
+              onApprove={(data, actions) => onApproveOrder(data, actions)}
+            />
+          </>
         )}
       </div>
 
