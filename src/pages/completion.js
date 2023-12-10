@@ -44,7 +44,6 @@ export default function Completion(props) {
   const [vouchers, setVouchers] = useState(null);
   const [pinShared, setPinShared] = useState(false);
   const [isMobile, setIsMobile] = useState(null);
-  const { stripePromise } = props;
 
   const getMoreVouchers = () => {
     sessionStorage.removeItem('cart');
@@ -149,50 +148,7 @@ export default function Completion(props) {
         </>
       );
     }
-
-    // stripePromise.then(async (stripe) => {
-    //   const url = new URL(window.location);
-    //   const clientSecret = url.searchParams.get('payment_intent_client_secret');
-    //   const { error, paymentIntent } = await stripe.retrievePaymentIntent(
-    //     clientSecret
-    //   );
-    //   setIntentStatus(paymentIntent.status);
-    //   setMessageBody(
-    //     error ? (
-    //       `${error.message}`
-    //     ) : (
-    //       <>
-    //         <strong>
-    //           Payment of {paymentIntent.currency.toUpperCase()}
-    //           {(paymentIntent.amount / 100).toFixed(2)} {paymentIntent.status}.
-    //         </strong>
-    //         <br />
-    //         <br />
-    //       </>
-    //     )
-    //   );
-    // });
   }, []);
-
-  // useEffect(() => {
-  //   if (!intentStatus) {
-  //     setMessageBody(<>Verifying payment ...</>);
-  //     return;
-  //   }
-
-  //   if (intentStatus === 'succeeded') {
-  //     setMessageBody(<>Payment {intentStatus}.</>);
-  //     mixpanel.track(`Successful Payment`);
-
-  //     voucherHandler();
-  //     setVoucherMessageBody(
-  //       <p>
-  //         Processing {recipients[0].name} {recipients[0].surname}
-  //         &apos;s voucher. Hold on tight ...
-  //       </p>
-  //     );
-  //   }
-  // }, [intentStatus]);
 
   const sendWhatsAppMessage = () => {
     mixpanel.track(`Sent WhatsApp message to a recipient with voucher`);
@@ -231,8 +187,13 @@ export default function Completion(props) {
   };
 
   const sendSmsMessage = () => {
-    mixpanel.track(`Sent sms to a recipient with voucher`);
+    mixpanel.track(`Sent SMS to a recipient with voucher`);
+
+    const cartItems = vouchers.map((item) => {
+      const description = document.createElement('div');
+      description.innerHTML = item.deal.voucherDescription;
       const termsAndConditions = document.createElement('div');
+      termsAndConditions.innerHTML = item.deal.termsAndConditions;
 
       return `
         ${item.quantity} x ${item.deal.redemptionCurrency}${(
@@ -245,7 +206,7 @@ export default function Completion(props) {
         
         Description: ${description.innerText}
       `;
-    };
+    });
 
     const message = `Congratulations ${recipients[0].name} ${
       recipients[0].surname
@@ -261,16 +222,6 @@ export default function Completion(props) {
     window.open(smsShareBlock, '_blank');
     setPinShared(true);
   };
-  
-  const getMessageBodyId = useMemo(() => {
-    if(intentStatus === 'succeeded') {
-      return 'succeeded_message'
-    }
-    if(!!intentStatus && intentStatus !== 'succeeded') {
-      return 'error_message'
-    }
-    return 'messages'
-  }, [intentStatus])
 
   const getMessageBodyId = useMemo(() => {
     if (intentStatus === 'succeeded') {
