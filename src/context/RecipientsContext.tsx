@@ -32,6 +32,10 @@ type RecipientsAction =
       payload: IRecipient; // The new recipient data
     }
   | {
+      type: 'ADD_RECIPIENTS';
+      payload: IRecipient[]; // The existing recipient data
+    }
+  | {
       type: 'ADD_RECIPIENT';
       payload: IRecipient; // The existing recipient data
     }
@@ -79,7 +83,7 @@ const reducer = (state: RecipientsState, action: RecipientsAction) => {
       return [...action.payload];
     case 'ADD_RECIPIENT':
       // Check if the recipient already exists in the state by id
-      const exists = state.some(
+      const exists1 = state.some(
         (r) =>
           r.name === action.payload.name &&
           r.surname === action.payload.surname &&
@@ -88,7 +92,7 @@ const reducer = (state: RecipientsState, action: RecipientsAction) => {
           r.senderId === action.payload.senderId
       );
       // If not, return a new state with the recipient added to the array
-      if (!exists) {
+      if (!exists1) {
         // save to database
         return [action.payload, ...state];
       } else {
@@ -96,6 +100,29 @@ const reducer = (state: RecipientsState, action: RecipientsAction) => {
         // Otherwise, return the same state without any changes
         return state;
       }
+    case 'ADD_RECIPIENTS':
+      console.log('ADD_RECIPIENTS', action.payload);
+      let recipientsList: IRecipient[] = [];
+      action.payload.forEach((recipient) => {
+        // Check if the recipient already exists in the state by id
+        const exists = state.some(
+          (r) =>
+            r.name === recipient.name &&
+            r.surname === recipient.surname &&
+            r.countryCode === recipient.countryCode &&
+            r.mobileNumber === recipient.mobileNumber &&
+            r.senderId === recipient.senderId
+        );
+        // If not, return a new state with the recipient added to the array
+        if (!exists) {
+          // save to database
+          recipientsList.push(recipient);
+        }
+      });
+      // return [recipient, ...recipientsList];
+      console.log('recipientsList', recipientsList);
+      return [...recipientsList, ...state];
+
     case 'UPDATE_RECIPIENT':
       // Find the index of the recipient in the state by id
       const index = state.findIndex((r) => r.id === action.payload.id);

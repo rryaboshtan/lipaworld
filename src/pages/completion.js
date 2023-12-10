@@ -94,8 +94,9 @@ export default function Completion(props) {
                   {(item.redemptionUnitValue / 100).toFixed(2)}{' '}
                   {item.deal.voucherName} voucher at {item.deal.merchantName}
                   <br />
-                  <strong>PIN: {item.voucherNumber}</strong>
                   <br />
+                  <strong>PIN: {item.voucherNumber}</strong>
+                  <br /> <br />
                   {item.deal.voucherDescription && (
                     <small>Description: {item.deal.voucherDescription}</small>
                   )}
@@ -130,6 +131,7 @@ export default function Completion(props) {
       voucherHandler();
       setVoucherMessageBody(
         <p>
+          <br />
           Processing {recipients[0].name} {recipients[0].surname}
           &apos;s voucher. Hold on tight ...
         </p>
@@ -316,13 +318,13 @@ export default function Completion(props) {
           <>
             <p></p>
             <p>
-              Tap Share Voucher PIN to share the details using your favourite
-              messaging app.
+              Click below to share the details using your favourite messaging
+              app.
             </p>
             <input
               type='button'
               className={styles.actionButton}
-              value='Share Voucher PIN on WhatsApp'
+              value='Send Voucher PIN using WhatsApp'
               onClick={sendWhatsAppMessage}
             />
             {isMobile && (
@@ -330,7 +332,7 @@ export default function Completion(props) {
                 type='button'
                 id='sendSmsId'
                 className={styles.actionButton}
-                value='Share Voucher PIN on SMS'
+                value='Send Voucher PIN on SMS'
                 onClick={sendSmsMessage}
               />
             )}

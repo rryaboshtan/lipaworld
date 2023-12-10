@@ -5,6 +5,7 @@ import axios from 'axios';
 import { TextField } from '@mui/material';
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
+import { useDispatchRecipients } from '@/context';
 
 import { setUserSession } from '../services/AuthService';
 import SideNav from '../components/sideNav/SideNav';
@@ -15,6 +16,7 @@ import { Montserrat } from 'next/font/google';
 const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function Signin(): JSX.Element {
+  const dispatchRecipients = useDispatchRecipients();
   const router = useRouter();
   const { query } = router;
   const { useremail } = query;
@@ -63,6 +65,21 @@ export default function Signin(): JSX.Element {
       const loginUrl = `${process.env.NEXT_PUBLIC_API_USERS_URL}/login`;
       const response = await axios.post(loginUrl, requestBody, requestConfig);
       setUserSession(response.data.token, response.data.user);
+
+      if (response.data.user) {
+        const url = `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/recipients?userId=${response.data.user.id}`;
+        try {
+          const response2 = await axios.get(url);
+          console.log('start adding recipients');
+          dispatchRecipients({
+            type: 'ADD_RECIPIENTS',
+            payload: response2.data['recipients'],
+          });
+        } catch (error) {
+          console.log('error', error);
+        }
+      }
+
       mixpanel.identify(response.data.user.email);
 
       if (searchParams?.has('return_url')) {

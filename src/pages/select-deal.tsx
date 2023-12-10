@@ -37,11 +37,10 @@ export default function SelectDeal() {
         recipients.length === 0 ? 'ZA' : recipients[0].countryCode;
       const { rate } = countries[countryCode];
       if (rate) {
-        console.log('rate iyi', rate);
         setCurrencyRate(rate);
       }
     }
-  }, []);
+  }, [countries, recipients]);
 
   useEffect(() => {
     if (recipientCountryCode) {
@@ -116,9 +115,6 @@ export default function SelectDeal() {
         {filteredVouchers && (
           <div>
             <p></p>
-            {/* {categoryList.length > 0 && (
-              <p>Available categories: {categoryList.join(', ')}</p>
-            )} */}
           </div>
         )}
         {!errorMessage && filteredVouchers && (

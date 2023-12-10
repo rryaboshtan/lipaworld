@@ -17,7 +17,7 @@ function RecipientButtons({
   const dispatchRecipients = useDispatchRecipients();
 
   const selectRecipientHandler = (recipient: IRecipient) => {
-    console.log('SELECT RECIPIENT', { ...recipient });
+    // console.log('SELECT RECIPIENT', { ...recipient });
 
     try {
       if (recipient) {

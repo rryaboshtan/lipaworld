@@ -50,7 +50,6 @@ export default function CartContainer() {
     null
   );
   const [cartTotalAmount, setCartTotalAmount] = useState<string>('0.00');
-  const [cartTaxFee, setCartTaxFee] = useState<string>('0.00');
   const [cartTransactionFee, setCartTransactionFee] = useState<string>('0.00');
   const [cartProcessingFee, setCartProcessingFee] = useState<string>('0.00');
   const [cartSubTotalAmount, setCartSubTotalAmount] = useState<string>('0.00');
@@ -185,24 +184,14 @@ export default function CartContainer() {
       const transactionFee = (Number(subTotalAmount) * 0.05).toFixed(2);
       setCartTransactionFee(transactionFee);
 
-      const tax = (
-        (Number(subTotalAmount) + Number(transactionFee)) *
-        0.15
-      ).toFixed(2);
-      setCartTaxFee(tax);
-
       const processingFee = (
-        (Number(subTotalAmount) + Number(transactionFee) + Number(tax)) *
-          0.025 +
+        (Number(subTotalAmount) + Number(transactionFee)) * 0.025 +
         0.3
       ).toFixed(2);
       setCartProcessingFee(processingFee);
 
       const totalAmount =
-        Number(subTotalAmount) +
-        Number(transactionFee) +
-        Number(tax) +
-        Number(processingFee);
+        Number(subTotalAmount) + Number(transactionFee) + Number(processingFee);
       setCartTotalAmount(totalAmount.toFixed(2));
 
       // save to storage
@@ -218,7 +207,7 @@ export default function CartContainer() {
 
   const updateTransactionAmounts = (
     processFee: string,
-    cartTaxFee: string,
+
     cartTotalAmount: string,
     cartTransactionFee: string
   ) => {
@@ -226,7 +215,6 @@ export default function CartContainer() {
       type: 'UPDATE_AMOUNTS',
       payload: {
         processingFee: Number(processFee),
-        tax: Number(cartTaxFee),
         cartTotalAmount: Number(cartTotalAmount),
         transactionFee: Number(cartTransactionFee),
       },
@@ -280,7 +268,6 @@ export default function CartContainer() {
 
     updateTransactionAmounts(
       cartProcessingFee,
-      cartTaxFee,
       cartTotalAmount,
       cartTransactionFee
     );
@@ -350,7 +337,6 @@ export default function CartContainer() {
                     currencyRate={currencyRate}
                     cartTransactionFee={cartTransactionFee}
                     cartProcessingFee={cartProcessingFee}
-                    cartTaxFee={cartTaxFee}
                     isMobile={isMobile}
                   />
                 )}

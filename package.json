@@ -34,14 +34,14 @@
     "@stripe/react-stripe-js": "^2.3.1",
     "@stripe/stripe-js": "^2.1.7",
     "@tanstack/react-query": "^4.32.6",
-    "axios": "^1.6.1",
+    "axios": "^1.6.2",
     "babel-plugin-macros": "^3.1.0",
     "country-code-lookup": "^0.1.0",
     "currency-symbol-map": "^5.1.0",
     "dotenv": "^16.3.1",
     "eslint-plugin-testing-library": "^6.0.2",
     "formik": "^2.4.5",
-    "mixpanel-browser": "^2.47.0",
+    "mixpanel-browser": "^2.48.1",
     "mobile-detect": "^1.4.5",
     "next": "13.4.19",
     "react": "18.2.0",
@@ -49,7 +49,7 @@
     "react-phone-number-input": "^3.3.4",
     "sass": "^1.66.1",
     "typescript": "5.2.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.17.0",

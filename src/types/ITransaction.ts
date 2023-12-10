@@ -13,7 +13,6 @@ export interface ITransaction {
   purchaseCountryName?: string;
   purchaseCurrency?: string;
   transactionFee?: number;
-  tax?: number;
   cartTotalAmount?: number;
   processingFee?: number;
 }

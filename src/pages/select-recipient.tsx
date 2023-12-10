@@ -13,13 +13,13 @@ import { Montserrat } from 'next/font/google';
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
 
-export default function BuyVoucher() {
+export default function SelectRecipient() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const recipients = useRecipients();
+
   const router = useRouter();
   const user = getUser();
-  const name = user !== 'undefined' && user ? user.name : '';
 
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
@@ -35,11 +35,6 @@ export default function BuyVoucher() {
       `/create-recipient/?${searchParams && searchParams.toString()}`
     );
   };
-
-  // const nextHandler = () => {
-  //   const params: URLSearchParams = new URLSearchParams(window.location.search);
-  //   router.push(`/send-voucher-to-recipient/?${params.toString()}`);
-  // };
 
   return (
     <main className={`${montserrat.className} ${styles.main}`}>
@@ -89,56 +84,27 @@ export default function BuyVoucher() {
               )
             ) : (
               <div>
-                No recipients found.{' '}
+                No recipients found. <br />
+                <br />
                 <Link href='create-recipient' className={styles.actionLink}>
                   Create a recipient
-                </Link>
+                </Link>{' '}
+                or{' '}
+                <Link href='login' className={styles.actionLink}>
+                  Login
+                </Link>{' '}
+                to see your previous recipients.
               </div>
             )}
           </div>
-
-          {/* <div>
-            <div>
-              {recipients.length > 0 ? (
-                recipients.map(
-                  (recipient, index) =>
-                    recipient.name && (
-                      <div key={index}>
-                        <Link
-                          href={`/select-voucher-partner?recipientCountryCode=${
-                            recipient.countryCode
-                          }&${searchParams && searchParams.toString()}`}
-                          className={styles.voucherButton}
-                        >
-                          {`${recipient.name} ${recipient.surname}`}
-                        </Link>
-                      </div>
-                    )
-                )
-              ) : (
-                <div>No recipients found.</div>
-              )}
-            </div>
-
-            <div className={styles.contentFooter}>
-              <input
-                type='button'
-                className={`${styles.actionButton} ${styles.mediumEmphasis}`}
-                value='Create new recipient'
-                onClick={createRecipientHandler}
-              />
-            </div>
-          </div> */}
         </div>
         <div className={styles.contentFooter}>
-          {recipients.length > 0 && (
-            <input
-              type='button'
-              className={`${styles.actionButton} ${styles.mediumEmphasis}`}
-              value='Create new recipient'
-              onClick={createRecipientHandler}
-            />
-          )}
+          <input
+            type='button'
+            className={`${styles.actionButton} ${styles.mediumEmphasis}`}
+            value='Create new recipient'
+            onClick={createRecipientHandler}
+          />
         </div>
 
         <Nav />

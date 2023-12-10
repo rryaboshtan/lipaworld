@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import dotenv from 'dotenv';
 import { useRouter } from 'next/router';
-import Img from 'next/image';
+// import Img from 'next/image';
 import { getUser } from '../services/AuthService';
 import { CreateOrderActions } from '@paypal/paypal-js';
 import {
-  useVouchers,
-  useCountries,
+  // useVouchers,
+  // useCountries,
   useRecipients,
   useCart,
   useTransaction,
@@ -158,6 +158,30 @@ export default function Payment(props: any) {
         {
           amount: {
             value: Number(transaction?.cartTotalAmount) ?? 800.99,
+            // useEffect(() => {
+            //   if (
+            //     transaction &&
+            //     transaction.cartTotalAmount &&
+            //     transaction.transactionId &&
+            //     !intentSent
+            //   ) {
+            //     console.log('start intent - amount', transaction.cartTotalAmount);
+            //     const requestOptions: RequestInit = {
+            //       method: 'POST',
+            //       headers: { 'Content-Type': 'application/json' },
+            //       body: JSON.stringify({
+            //         amount: !transaction.cartTotalAmount
+            //           ? 1
+            //           : Number(transaction.cartTotalAmount) * 100,
+            //         currency: 'USD',
+            //         description: 'LIPAWORLD VOUCHERS',
+            //         metadata: {
+            //           transaction_id: transaction.transactionId ?? 't',
+            //           cart_id: cart?.cartId || provisionalCartId,
+            //           sender_id: user.id ?? 'u',
+            //           recipient_id: transaction.recipientIds[0] ?? 'r',
+            //           amount: Number(transaction.cartTotalAmount) * 100,
+            //         },
           },
         },
       ],

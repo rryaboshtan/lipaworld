@@ -24,7 +24,6 @@ type TransactionState = {
   purchaseCountryName?: string;
   redemptionCurrency?: string;
   transactionFee?: number;
-  tax?: number;
   cartTotalAmount?: number;
   exchangeRateId?: string;
 } | null;
@@ -51,7 +50,6 @@ type TransactionAction =
       type: 'UPDATE_AMOUNTS';
       payload: {
         processingFee: number;
-        tax: number;
         cartTotalAmount: number;
         transactionFee: number;
       };
@@ -114,7 +112,6 @@ const reducer = (state: TransactionState | null, action: TransactionAction) => {
       return {
         ...state,
         processingFee: action.payload.processingFee,
-        tax: action.payload.tax,
         cartTotalAmount: action.payload.cartTotalAmount,
         transactionFee: action.payload.transactionFee,
       };
@@ -157,7 +154,6 @@ const defaultTransaction: TransactionState = {
   purchaseCountryName: 'United States',
   redemptionCurrency: 'ZAR',
   transactionFee: 0,
-  tax: 0,
   cartTotalAmount: 0,
   exchangeRateId: 'x',
 };

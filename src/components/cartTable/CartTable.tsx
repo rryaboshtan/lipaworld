@@ -13,7 +13,6 @@ interface ICartTableProps {
   currencyRate: number;
   cartTransactionFee: string;
   cartProcessingFee: string;
-  cartTaxFee: string;
   isMobile: boolean | null;
 }
 
@@ -24,7 +23,6 @@ function CartTable({
   currencyRate,
   cartTransactionFee,
   cartProcessingFee,
-  cartTaxFee,
   isMobile,
 }: ICartTableProps) {
   const renderMobileTable = () => {
@@ -68,11 +66,6 @@ function CartTable({
             <td></td>
             <td className={styles.cartItemDescription}>Processing fee</td>
             <td className={styles.cartItemAmount}>USD {cartProcessingFee}</td>
-          </tr>
-          <tr className={styles.cartItemRow} style={{ fontSize: '0.8rem' }}>
-            <td></td>
-            <td className={styles.cartItemDescription}>Tax (15%)</td>
-            <td className={styles.cartItemAmount}>USD {cartTaxFee}</td>
           </tr>
           <tr className={styles.cartItemRow}>
             <td></td>
@@ -160,11 +153,6 @@ function CartTable({
             <td></td>
             <td className={styles.cartItemDescription}>Processing fee</td>
             <td className={styles.cartItemAmount}>USD {cartProcessingFee}</td>
-          </tr>
-          <tr className={styles.cartItemRow} style={{ fontSize: '0.8rem' }}>
-            <td></td>
-            <td className={styles.cartItemDescription}>Tax (15%)</td>
-            <td className={styles.cartItemAmount}>USD {cartTaxFee}</td>
           </tr>
           <tr className={styles.cartItemRow}>
             <td></td>
