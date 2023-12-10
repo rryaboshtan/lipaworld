@@ -36,6 +36,10 @@ type RecipientsAction =
       payload: IRecipient; // The existing recipient data
     }
   | {
+      type: 'ADD_RECIPIENTS';
+      payload: IRecipient[]; // The existing recipient data
+    }
+  | {
       type: 'SELECT_RECIPIENT';
       payload: IRecipient; // The selected recipient data
     }
@@ -68,6 +72,11 @@ const reducer = (state: RecipientsState, action: RecipientsAction) => {
       // action.payload.id = uuid();
       // Return a new state with the new recipient added to the array
       return [...state, action.payload];
+    case 'ADD_RECIPIENTS':
+      // Generate a random id for the new recipient
+      // action.payload.id = uuid();
+      // Return a new state with the new recipient added to the array
+      return [...action.payload];
     case 'ADD_RECIPIENT':
       // Check if the recipient already exists in the state by id
       const exists = state.some(

@@ -23,6 +23,7 @@ import { Montserrat } from 'next/font/google';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
+import mixpanel from "mixpanel-browser";
 
 export default function CartContainer() {
   const router = useRouter();
@@ -304,6 +305,7 @@ export default function CartContainer() {
     }
 
     if (name) {
+      mixpanel.track(`Voucher Purchase Initiated`);      
       router.push(`/payment`);
     }
   };

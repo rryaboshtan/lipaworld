@@ -4,13 +4,12 @@ import { useVouchers, useCountries, useRecipients } from '@/context';
 import { IVoucher, ICountry } from '@/types';
 import { getUser } from '../services/AuthService';
 import Nav from '../components/nav/Nav';
-import CartButtons from '../components/cartButtons/CartButtons';
 import SideNav from '../components/sideNav/SideNav';
 import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
-
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
+import VoucherCard from "@components/voucherCard/VoucherCard";
 
 export default function SelectDeal() {
   const router = useRouter();
@@ -128,55 +127,11 @@ export default function SelectDeal() {
 
             <div className={styles.dealHolder}>
               {filteredVouchers.map((voucher, index) => (
-                <div
-                  key={index}
-                  className={styles.dealPanel}
-                  style={{
-                    backgroundImage: `url("${voucher.voucherImageUrl}")`,
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                  }}
-                >
-                  <div
-                    className={` ${styles.amounts}`}
-                    style={{
-                      marginTop: '144px',
-                      marginLeft: '12px',
-                      marginRight: '12px',
-                    }}
-                  >
-                    <div className={styles.dealVoucherName}>
-                      {voucher.voucherName}
-                    </div>
-                    <div className={styles.amountRedemption}>
-                      <strong>
-                        {voucher.redemptionCurrency}
-                        {(voucher.redemptionValues[0] / 100).toFixed(2)}
-                        {'   '}
-                      </strong>
-                      <span className={styles.amountPurchase}>
-                        (USD{' '}
-                        {(
-                          voucher.redemptionValues[0] /
-                          100 /
-                          currencyRate
-                        ).toFixed(2)}
-                        )
-                      </span>
-                    </div>
-                    <div className={styles.amountRedemptionj}>
-                      {voucher.voucherDescription}
-                    </div>
-                    <div className={styles.dealMerchant}>
-                      Merchant: {voucher.merchantName}
-                    </div>
-                  </div>
-
-                  <CartButtons
-                    deal={voucher}
-                    setErrorMessage={setErrorMessage}
-                  />
-                </div>
+                <VoucherCard 
+                  key={index} 
+                  voucher={voucher} 
+                  currencyRate={currencyRate}
+                  setErrorMessage={setErrorMessage} />               
               ))}
             </div>
           </div>

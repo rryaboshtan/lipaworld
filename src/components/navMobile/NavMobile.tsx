@@ -5,6 +5,7 @@ import { useMerchants } from '@/context';
 import Cart from '@/components/cart/Cart';
 import styles from './NavMobile.module.scss';
 import { getUser } from '@/services/AuthService';
+import Logo from "@components/logo/Logo";
 
 interface NavProps {
   //   categories: string[];
@@ -62,9 +63,7 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
   return (
     <>
       <nav className={styles.nav}>
-        <Link href={`/?recipientCountryCode=ZA`}>
-          <Img src='/logo.png' alt='logo' height={34} width={162} />
-        </Link>
+       <Logo />
         <>
           {withCart && (
             <div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useMemo} from 'react';
 import { useRouter } from 'next/router';
 import dotenv from 'dotenv';
 import axios from 'axios';
@@ -11,6 +11,7 @@ import NavMobile from '../components/navMobile/NavMobile';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 import styles from '../styles/page.module.css';
+import mixpanel from "mixpanel-browser";
 dotenv.config();
 
 export default function Completion(props) {
@@ -152,6 +153,8 @@ export default function Completion(props) {
 
     if (intentStatus === 'succeeded') {
       setMessageBody(<>Payment {intentStatus}.</>);
+      mixpanel.track(`Successful Payment`);
+      
       voucherHandler();
       setVoucherMessageBody(
         <p>
@@ -163,6 +166,8 @@ export default function Completion(props) {
   }, [intentStatus]);
 
   const sendWhatsAppMessage = () => {
+    mixpanel.track(`Sent WhatsApp message to a recipient with voucher`);
+    
     const cartItems = vouchers.map((item) => {
       const description = document.createElement('div');
       description.innerHTML = item.deal.voucherDescription;
@@ -198,6 +203,8 @@ export default function Completion(props) {
   };
 
   const sendSmsMessage = () => {
+    mixpanel.track(`Sent sms to a recipient with voucher`);
+    
     const cartItems = vouchers.map((item) => {
       const description = document.createElement('div');
       description.innerHTML = item.deal.voucherDescription;
@@ -231,6 +238,16 @@ export default function Completion(props) {
     window.open(smsShareBlock, '_blank');
     setPinShared(true);
   };
+  
+  const getMessageBodyId = useMemo(() => {
+    if(intentStatus === 'succeeded') {
+      return 'succeeded_message'
+    }
+    if(!!intentStatus && intentStatus !== 'succeeded') {
+      return 'error_message'
+    }
+    return 'messages'
+  }, [intentStatus])
 
   return (
     <main className={`${montserrat.className} ${styles.main}`}>
@@ -241,7 +258,7 @@ export default function Completion(props) {
           <div className={styles.pageHeading}>Thank you, {name}!</div>
         )} */}
         <div
-          id='messages'
+          id={getMessageBodyId}
           role='alert'
           style={messageBody ? { display: 'block' } : {}}
         >
@@ -280,6 +297,7 @@ export default function Completion(props) {
             {isMobile && (
               <input
                 type='button'
+                id="sendSmsId"
                 className={styles.actionButton}
                 value='Share Voucher PIN on SMS'
                 onClick={sendSmsMessage}

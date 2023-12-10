@@ -14,9 +14,11 @@ import styles from './CartButtons.module.scss';
 interface ICartButtonsProps {
   deal: IVoucher;
   setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
+  quantity: number
+  isHistory?: boolean
 }
 
-function CartButtons({ deal, setErrorMessage }: ICartButtonsProps) {
+function CartButtons({ deal, setErrorMessage, quantity, isHistory }: ICartButtonsProps) {
   const [isCarted, setIsCarted] = useState<boolean>(false);
   const dispatchCart = useDispatchCart();
   const cart = useCart();
@@ -29,8 +31,7 @@ function CartButtons({ deal, setErrorMessage }: ICartButtonsProps) {
 
   const addtoCartHandler = (
     deal: IVoucher,
-    amount: number,
-    quantity: number
+    amount: number
   ) => {
     console.log('ADD TO CART', { ...deal, quantity: quantity });
 
@@ -56,6 +57,12 @@ function CartButtons({ deal, setErrorMessage }: ICartButtonsProps) {
     }
   };
 
+  
+  const resendHandler = () => {
+    addtoCartHandler(deal, deal.redemptionValues[0])
+    router.push(`/cart`);    
+  }
+  
   useEffect(() => {
     console.log('CART ITEMS', cart?.cartItems);
     if (cart && cart.cartItems.length > 0 && deal.dealId) {
@@ -67,10 +74,18 @@ function CartButtons({ deal, setErrorMessage }: ICartButtonsProps) {
 
   return (
     <div className={styles.cartHolder}>
+      {isHistory &&
+       <button
+        className={styles.cart}
+        onClick={() => resendHandler()}
+       >
+        Resend
+       </button>
+      }
       {!isCarted ? (
         <button
           className={styles.cart}
-          onClick={() => addtoCartHandler(deal, deal.redemptionValues[0], 1)}
+          onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
         >
           Add to Cart
         </button>

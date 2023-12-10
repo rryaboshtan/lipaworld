@@ -3,7 +3,7 @@ import axios from 'axios';
 import Img from 'next/image';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { TextField } from '@mui/material';
+import {Checkbox, TextField} from '@mui/material';
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
 
@@ -21,6 +21,7 @@ export default function Register(): JSX.Element {
   const [countryCode, setCountryCode] = useState<string>('');
   const [country, setCountry] = useState<string>('');
   const [message, setMessage] = useState<null | string>(null);
+  const [agreedWithTerms, setAgreedWithTerms] = useState<boolean>(false);
 
   const registerUrl = `${process.env.NEXT_PUBLIC_API_USERS_URL}/register`;
 
@@ -58,7 +59,7 @@ export default function Register(): JSX.Element {
       !dateOfBirth ||
       !postCode ||
       !city ||
-      !country;
+      !country ;
 
     const hackyDetail =
       hackyRegex.test(surname) ||
@@ -80,7 +81,12 @@ export default function Register(): JSX.Element {
     }
 
     if (missingDetail) {
-      setMessage('Please fill in all required fields');
+      setMessage('Please fill in all required fields.');
+      return;
+    }
+    
+    if (!agreedWithTerms) {
+      setMessage('Please accept our Terms & Conditions and Privacy Policy.');
       return;
     }
 
@@ -117,10 +123,13 @@ export default function Register(): JSX.Element {
         requestConfig
       );
       setMessage('Registration successful');
+      mixpanel.track('Registration successful');
 
       // console.log(response);
       router.push('/login/?useremail=' + email);
     } catch (error: any) {
+      mixpanel.track(`Registration failed with code: ${error.code}`);
+      
       if (error.response?.status === 401 || error.response?.status === 403) {
         setMessage('Invalid credentials');
       } else {
@@ -307,6 +316,17 @@ export default function Register(): JSX.Element {
                   style={{ width: '100%', backgroundColor: '#ffffff' }}
                 />
               </div>
+              <div className={styles.formCheckboxElement}>
+                <label htmlFor='confirmPassword'>
+                  I accept your  <Link href={"/terms-conditions"}>Terms & Conditions</Link> and <Link href={"/privacy-policy"}>Privacy Policy</Link>.
+                </label>
+                <Checkbox 
+                  checked={agreedWithTerms} 
+                  required
+                  onChange={(event) => setAgreedWithTerms(event.target.checked)}  
+                  color="success"
+                />
+              </div>
 
               <div> {message && <p className='message'>{message}</p>}</div>
               <div className={styles.contentFooter}>
@@ -316,10 +336,10 @@ export default function Register(): JSX.Element {
                   value='Join Now'
                 />
                 <div>
-                  <p>
-                    By clicking &quot;Join now&quot;, you are agreeing to our
-                    Terms &amp; Conditions and Privacy Policy
-                  </p>
+                  {/*<p>*/}
+                  {/*  By clicking &quot;Join now&quot;, you are agreeing to our*/}
+                  {/*  Terms &amp; Conditions and Privacy Policy*/}
+                  {/*</p>*/}
                   <p>
                     Already have an account? <Link href='/login'>Sign In</Link>
                   </p>

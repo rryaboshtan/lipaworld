@@ -18,6 +18,7 @@ import '@/styles/globals.css';
 
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import Script from "next/script";
 
 dotenv.config();
 
@@ -52,22 +53,45 @@ export default function App({ Component, pageProps }: AppProps) {
   });
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <UserProvider>
-        <CountriesProvider>
-          <MerchantsProvider>
-            <RecipientsProvider>
-              <VouchersProvider>
-                <TransactionProvider>
-                  <CartProvider>
-                    <Component {...pageProps} stripePromise={stripePromise} />
-                  </CartProvider>
-                </TransactionProvider>
-              </VouchersProvider>
-            </RecipientsProvider>
-          </MerchantsProvider>
-        </CountriesProvider>
-      </UserProvider>
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <UserProvider>
+          <CountriesProvider>
+            <MerchantsProvider>
+              <RecipientsProvider>
+                <VouchersProvider>
+                  <TransactionProvider>
+                    <CartProvider>
+                      <Component {...pageProps} stripePromise={stripePromise} />
+                    </CartProvider>
+                  </TransactionProvider>
+                </VouchersProvider>
+              </RecipientsProvider>
+            </MerchantsProvider>
+          </CountriesProvider>
+        </UserProvider>
+      </QueryClientProvider>
+      <Script id="gtm"src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`} />
+      <Script
+        id="gtm2"
+        dangerouslySetInnerHTML={{
+          __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+							new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+						j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+						'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+					})(window,document,'script','dataLayer','${process.env.NEXT_PUBLIC_GTM}');
+					`
+        }}
+      />
+      {/*Start of HubSpot Embed Code*/}
+      <Script 
+        type="text/javascript" 
+        id="hs-script-loader" 
+        async 
+        defer 
+        src={process.env.NEXT_PUBLIC_HUBSPOT_CHAT}
+      />
+      {/*End of HubSpot Embed Code */}
+    </>      
   );
 }

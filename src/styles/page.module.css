@@ -208,7 +208,8 @@
 }
 
 .contentFooter a,
-a.actionLink {
+a.actionLink,
+.formCheckboxElement a {
   color: darkgreen;
   text-decoration: underline !important;
 }
@@ -228,7 +229,7 @@ a.actionLink {
   font-weight: normal;
 
   margin-top: 6px;
-  color: gray;
+  color: rgb(128, 128, 128);
 }
 
 .cartItemRow {
@@ -366,6 +367,21 @@ a.actionLink {
   gap: 0.375rem;
 }
 
+.formCheckboxElement {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1rem;
+  width: 100%;
+  gap: 0.375rem;
+}
+
+.formCheckboxElement a {
+  color: darkgreen;
+  text-decoration: underline !important;
+}
+
 .required {
   color: red;
   margin-left: 0.25rem;
@@ -375,6 +391,51 @@ a.actionLink {
   color: red;
   font-size: 0.8rem;
   margin-top: 0.25rem;
+}
+
+.policyPage {
+  max-width: var(--max-width);
+  width: 100%;
+  margin: 0 auto;
+}
+
+.policyPageHeading {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.policyContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.policyContentWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.policyContentWrapperTitle {
+    font-size: 1.5rem;
+    font-weight: 600;
+    width: 100%;
+}
+
+.policyContentList {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.privacyTable {
+  border-collapse: collapse;
+}
+.privacyTable th, .privacyTable td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #000000;
 }
 
 /* Mobile */
@@ -469,7 +530,6 @@ a.actionLink {
     z-index: 1;
   }
 }
-
 /* Tablet and Smaller Desktop */
 @media (min-width: 701px) and (max-width: 1120px) {
   .grid {
