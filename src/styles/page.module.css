@@ -417,9 +417,9 @@ a.actionLink,
 }
 
 .policyContentWrapperTitle {
-    font-size: 1.5rem;
-    font-weight: 600;
-    width: 100%;
+  font-size: 1.5rem;
+  font-weight: 600;
+  width: 100%;
 }
 
 .policyContentList {
@@ -432,7 +432,8 @@ a.actionLink,
 .privacyTable {
   border-collapse: collapse;
 }
-.privacyTable th, .privacyTable td {
+.privacyTable th,
+.privacyTable td {
   padding: 10px;
   text-align: center;
   border: 1px solid #000000;
@@ -579,4 +580,8 @@ a.actionLink,
   .homeBanner {
     width: 100%;
   }
+}
+
+.cartWapper {
+  width: 100%;
 }

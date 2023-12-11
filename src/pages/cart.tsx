@@ -207,7 +207,6 @@ export default function CartContainer() {
 
   const updateTransactionAmounts = (
     processFee: string,
-
     cartTotalAmount: string,
     cartTransactionFee: string
   ) => {
@@ -273,11 +272,6 @@ export default function CartContainer() {
     );
     updateRecipients(recipients, user);
 
-    console.log('CHECKOUT TOTAL', cartTotalAmount);
-    console.log('CHECKOUT FEES', cartTransactionFee);
-    console.log('CHECKOUT CART', cart);
-    console.log('CHECKOUT TRANSACTION', transaction);
-
     if (recipients.length === 0) {
       router.push(`/create-recipient`);
       return;
@@ -322,7 +316,7 @@ export default function CartContainer() {
           <div className={styles.navSidedBody}>
             <SideNav />
 
-            <div>
+            <div className={styles.cartWapper}>
               <div className={styles.pageHeading}>Cart</div>
 
               <div></div>

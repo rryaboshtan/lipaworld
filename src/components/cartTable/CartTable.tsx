@@ -51,6 +51,10 @@ function CartTable({
                 </td>
                 <td className={styles.cartItemDescription}>
                   {renderMobileItemDescription(item)}
+                  <span className={`${styles.dealMerchant}`}>
+                    ({item.deal.redemptionCurrency}{' '}
+                    {(item.deal.redemptionValues[0] / 100).toFixed(2)})
+                  </span>
                 </td>
                 <td className={styles.cartItemAmount}>
                   {renderMobileItemAmount(item)}
@@ -109,7 +113,14 @@ function CartTable({
 
   const renderMobileItemAmount = (item: ICartItem) => {
     return (
-      <>USD {(item.deal.redemptionValues[0] / 100 / currencyRate).toFixed(2)}</>
+      <>
+        USD{' '}
+        {(
+          (item.quantity * item.deal.redemptionValues[0]) /
+          100 /
+          currencyRate
+        ).toFixed(2)}
+      </>
     );
   };
 
@@ -124,7 +135,6 @@ function CartTable({
                   <div className={styles.amountRedemption}>{item.quantity}</div>
                   <div className={styles.cartRemoveButton}>
                     <button
-                      // className={styles.cart}
                       onClick={() => removeFromCartHandler(item.cartItemId)}
                       className={styles2.removeButton}
                     >
@@ -137,7 +147,11 @@ function CartTable({
                   </div>
                 </td>
                 <td className={styles.cartItemDescription}>
-                  {item.deal.voucherName}
+                  {item.deal.voucherName}{' '}
+                  <span className={`${styles.dealMerchant}`}>
+                    ({item.deal.redemptionCurrency}{' '}
+                    {(item.deal.redemptionValues[0] / 100).toFixed(2)})
+                  </span>
                 </td>
                 <td className={styles.cartItemAmount}>
                   {renderDesktopItemAmount(item)}
@@ -172,7 +186,14 @@ function CartTable({
 
   const renderDesktopItemAmount = (item: ICartItem) => {
     return (
-      <>USD {(item.deal.redemptionValues[0] / 100 / currencyRate).toFixed(2)}</>
+      <>
+        USD{' '}
+        {(
+          (item.quantity * item.deal.redemptionValues[0]) /
+          100 /
+          currencyRate
+        ).toFixed(2)}
+      </>
     );
   };
 
