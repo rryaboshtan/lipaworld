@@ -35,6 +35,16 @@ export default function Payment(props: any) {
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
   );
+  const [returnUrl, setReturnUrl] = useState('');
+
+  useEffect(() => {
+    setReturnUrl(window.location.pathname);
+  }, []);
+
+  useEffect(() => {
+    const params: URLSearchParams = new URLSearchParams(window.location.search);
+    setSearchParams(params);
+  }, []);
 
   const recipients = useRecipients();
   const cart = useCart();
@@ -213,7 +223,8 @@ export default function Payment(props: any) {
         ) : (
           <>
             <div>
-              Pay now
+              <div className={styles.pageHeading}>Select payment method</div>
+              <br />
               <br />
             </div>
             <PayPalButtons
@@ -225,7 +236,7 @@ export default function Payment(props: any) {
         )}
       </div>
 
-      <Nav />
+      {/* <Nav /> */}
     </main>
   );
 }

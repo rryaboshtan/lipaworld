@@ -5,7 +5,7 @@ import { useMerchants } from '@/context';
 import Cart from '@/components/cart/Cart';
 import styles from './NavMobile.module.scss';
 import { getUser } from '@/services/AuthService';
-import Logo from "@components/logo/Logo";
+import Logo from '@components/logo/Logo';
 
 interface NavProps {
   //   categories: string[];
@@ -23,13 +23,25 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
   const user = getUser();
 
   useEffect(() => {
+    if (merchants.length === 0) return;
+
+    const topCategories = [
+      'Shopping',
+      'Airtime',
+      'Data',
+      'Fuel',
+      'Healthcare',
+      'Utilities',
+    ];
+
+    // get unique categories
     const uniqueCategories = new Set<string>();
-    // fetch a list of unique categories from the merchants
-    if (merchants.length > 0) {
-      const categories = merchants.flatMap((merchant) => merchant.categories);
-      categories.forEach((category) => uniqueCategories.add(category));
-      setCategories(Array.from(uniqueCategories));
-    }
+    const categories = merchants.flatMap((merchant) => merchant.categories);
+    categories.forEach(
+      (category) =>
+        topCategories.includes(category) && uniqueCategories.add(category)
+    );
+    setCategories(Array.from(uniqueCategories));
   }, [merchants]);
 
   useEffect(() => {
@@ -63,7 +75,7 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
   return (
     <>
       <nav className={styles.nav}>
-       <Logo />
+        <Logo />
         <>
           {withCart && (
             <div>
@@ -99,10 +111,11 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
           className={styles.voucherButton}
           onClick={() => setIsOpen(false)}
         >
-          All categories
+          All categories +
         </Link>
         <br />
 
+        <br />
         <br />
         <br />
         {!isAuthed && (

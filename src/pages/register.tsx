@@ -1,9 +1,20 @@
 import { useState } from 'react';
 import axios from 'axios';
-import Img from 'next/image';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import {Checkbox, TextField} from '@mui/material';
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Checkbox,
+  TextField,
+  InputAdornment,
+  IconButton,
+} from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
 
@@ -23,6 +34,12 @@ export default function Register(): JSX.Element {
   const [message, setMessage] = useState<null | string>(null);
   const [agreedWithTerms, setAgreedWithTerms] = useState<boolean>(false);
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   const registerUrl = `${process.env.NEXT_PUBLIC_API_USERS_URL}/register`;
 
   const hackyRegex =
@@ -41,7 +58,9 @@ export default function Register(): JSX.Element {
     const confirmPassword = event.currentTarget.confirmPassword.value.trim();
     const name = event.currentTarget.fname.value.trim();
     const surname = event.currentTarget.surname.value.trim();
-    const dateOfBirth = event.currentTarget.dateOfBirth.value.trim();
+    const dateOfBirthDD = event.currentTarget.dateOfBirthDD.value.trim();
+    const dateOfBirthMM = event.currentTarget.dateOfBirthMM.value.trim();
+    const dateOfBirthYYYY = event.currentTarget.dateOfBirthYYYY.value.trim();
     const postCode = event.currentTarget.postCode.value.trim();
     const city = event.currentTarget.city.value.trim();
     const gender = event.currentTarget.gender.value.trim();
@@ -56,10 +75,12 @@ export default function Register(): JSX.Element {
       !password ||
       !confirmPassword ||
       !gender ||
-      !dateOfBirth ||
+      !dateOfBirthDD ||
+      !dateOfBirthMM ||
+      !dateOfBirthYYYY ||
       !postCode ||
       !city ||
-      !country ;
+      !country;
 
     const hackyDetail =
       hackyRegex.test(surname) ||
@@ -68,7 +89,9 @@ export default function Register(): JSX.Element {
       hackyRegex.test(password) ||
       hackyRegex.test(confirmPassword) ||
       hackyRegex.test(name) ||
-      hackyRegex.test(dateOfBirth) ||
+      hackyRegex.test(dateOfBirthDD) ||
+      hackyRegex.test(dateOfBirthMM) ||
+      hackyRegex.test(dateOfBirthYYYY) ||
       hackyRegex.test(postCode) ||
       hackyRegex.test(city) ||
       hackyRegex.test(country);
@@ -80,11 +103,41 @@ export default function Register(): JSX.Element {
       return;
     }
 
+    const dateOfBirth = `${dateOfBirthDD}/${dateOfBirthMM}/${dateOfBirthYYYY}`;
+
+    if (new Date(dateOfBirth) > new Date()) {
+      setMessage('Date of birth is invalid.');
+      return;
+    }
+
+    if (!dateOfBirthDD || !dateOfBirthMM || !dateOfBirthYYYY) {
+      setMessage('Date of Birth is required');
+      return;
+    }
+
+    if (dateOfBirthDD < 1 || dateOfBirthDD > 31) {
+      setMessage('Day must be between 1 and 31');
+      return;
+    }
+
+    if (dateOfBirthMM < 1 || dateOfBirthMM > 12) {
+      setMessage('Month must be between 1 and 12');
+      return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    if (dateOfBirthYYYY < 1900 || dateOfBirthYYYY > currentYear - 18) {
+      setMessage(
+        `Year must be between 1900 and ${currentYear - 18}. At least aged 18.`
+      );
+      return;
+    }
+
     if (missingDetail) {
       setMessage('Please fill in all required fields.');
       return;
     }
-    
+
     if (!agreedWithTerms) {
       setMessage('Please accept our Terms & Conditions and Privacy Policy.');
       return;
@@ -126,10 +179,15 @@ export default function Register(): JSX.Element {
       mixpanel.track('Registration successful');
 
       // console.log(response);
-      router.push('/login/?useremail=' + email);
+      router.push(
+        '/login/?useremail=' +
+          email +
+          '&return_url=' +
+          '/select-deal?recipientCountryCode=ZA&category=Electricity'
+      );
     } catch (error: any) {
       mixpanel.track(`Registration failed with code: ${error.code}`);
-      
+
       if (error.response?.status === 401 || error.response?.status === 403) {
         setMessage('Invalid credentials');
       } else {
@@ -220,17 +278,64 @@ export default function Register(): JSX.Element {
                 <label htmlFor='dateOfBirth'>
                   Date of birth<span className={styles.required}>*</span>:
                 </label>
-                <TextField
-                  autoComplete='off'
-                  hiddenLabel
-                  type='text'
-                  id='dateOfBirth'
-                  defaultValue=''
-                  variant='outlined'
-                  name='dateOfBirth'
-                  required
-                  style={{ width: '100%', backgroundColor: '#ffffff' }}
-                />
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <TextField
+                    autoComplete='off'
+                    hiddenLabel
+                    type='number'
+                    id='dateOfBirthDD'
+                    defaultValue=''
+                    variant='outlined'
+                    name='dateOfBirthDD'
+                    required
+                    placeholder='DD'
+                    sx={{
+                      width: '20%',
+                      backgroundColor: '#ffffff',
+                      margin: '0 20px 0 0',
+                    }}
+                  />
+                  /
+                  <TextField
+                    autoComplete='off'
+                    hiddenLabel
+                    type='number'
+                    id='dateOfBirthMM'
+                    defaultValue=''
+                    variant='outlined'
+                    name='dateOfBirthMM'
+                    required
+                    placeholder='MM'
+                    sx={{
+                      width: '20%',
+                      backgroundColor: '#ffffff',
+                      margin: '0 20px',
+                    }}
+                  />
+                  /
+                  <TextField
+                    autoComplete='off'
+                    hiddenLabel
+                    type='number'
+                    id='dateOfBirthYYYY'
+                    defaultValue=''
+                    variant='outlined'
+                    name='dateOfBirthYYYY'
+                    required
+                    placeholder='YYYY'
+                    sx={{
+                      width: '30%',
+                      backgroundColor: '#ffffff',
+                      margin: '0 20px',
+                    }}
+                  />
+                </div>
               </div>
 
               <div className={styles.formElement}>
@@ -262,7 +367,6 @@ export default function Register(): JSX.Element {
                   defaultValue=''
                   variant='outlined'
                   name='postCode'
-                  required
                   style={{ width: '100%', backgroundColor: '#ffffff' }}
                 />
               </div>
@@ -271,17 +375,20 @@ export default function Register(): JSX.Element {
                 <label htmlFor='gender'>
                   Gender<span className={styles.required}>*</span>:
                 </label>
-                <TextField
-                  autoComplete='off'
-                  hiddenLabel
-                  type='text'
-                  id='gender'
-                  defaultValue=''
-                  variant='outlined'
-                  name='gender'
-                  required
-                  style={{ width: '100%', backgroundColor: '#ffffff' }}
-                />
+                <FormControl variant='outlined' style={{ width: '100%' }}>
+                  <Select
+                    labelId='gender-label'
+                    id='gender'
+                    name='gender'
+                    defaultValue=''
+                    required
+                    style={{ width: '100%', backgroundColor: '#ffffff' }}
+                  >
+                    <MenuItem value='Female'>Female</MenuItem>
+                    <MenuItem value='Male'>Male</MenuItem>
+                    <MenuItem value='Other'>Other</MenuItem>
+                  </Select>
+                </FormControl>
               </div>
 
               <div className={styles.formElement}>
@@ -291,15 +398,28 @@ export default function Register(): JSX.Element {
                 <TextField
                   autoComplete='off'
                   hiddenLabel
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   id='password'
                   defaultValue=''
                   variant='outlined'
                   name='password'
                   required
                   style={{ width: '100%', backgroundColor: '#ffffff' }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          aria-label='toggle password visibility'
+                          onClick={handleClickShowPassword}
+                        >
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </div>
+
               <div className={styles.formElement}>
                 <label htmlFor='confirmPassword'>
                   Confirm password<span className={styles.required}>*</span>:
@@ -318,13 +438,21 @@ export default function Register(): JSX.Element {
               </div>
               <div className={styles.formCheckboxElement}>
                 <label htmlFor='confirmPassword'>
-                  I accept your  <Link href={"/terms-conditions"}>Terms & Conditions</Link> and <Link href={"/privacy-policy"}>Privacy Policy</Link>.
+                  I accept your{' '}
+                  <Link href={'/terms-conditions'} target='_blank'>
+                    Terms & Conditions
+                  </Link>{' '}
+                  and{' '}
+                  <Link href={'/privacy-policy'} target='_blank'>
+                    Privacy Policy
+                  </Link>
+                  .
                 </label>
-                <Checkbox 
-                  checked={agreedWithTerms} 
+                <Checkbox
+                  checked={agreedWithTerms}
                   required
-                  onChange={(event) => setAgreedWithTerms(event.target.checked)}  
-                  color="success"
+                  onChange={(event) => setAgreedWithTerms(event.target.checked)}
+                  color='success'
                 />
               </div>
 
@@ -350,7 +478,7 @@ export default function Register(): JSX.Element {
         </div>
       </div>
 
-      <Nav />
+      {/* <Nav /> */}
     </main>
   );
 }

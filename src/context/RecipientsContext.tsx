@@ -5,18 +5,9 @@ import {
   ReactNode,
   Dispatch,
 } from 'react';
-// import { v4 as uuid } from 'uuid';
+import { IRecipient } from '@/types';
 
 // Define the interface for the recipient data
-interface IRecipient {
-  id?: string;
-  name?: string;
-  surname?: string;
-  country?: string;
-  countryCode: string;
-  mobileNumber: string;
-  senderId?: string | null;
-}
 interface IRecipientResponse {
   recipientId: string;
   email?: string;
@@ -116,9 +107,13 @@ const reducer = (state: RecipientsState, action: RecipientsAction) => {
         // If not, return a new state with the recipient added to the array
         if (!exists) {
           // save to database
+          // recipientsList.sort((a, b) => a.name.localeCompare(b.name));
           recipientsList.push(recipient);
         }
       });
+      if (!action.payload) {
+        return state;
+      }
       // return [recipient, ...recipientsList];
       console.log('recipientsList', recipientsList);
       return [...recipientsList, ...state];

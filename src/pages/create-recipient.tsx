@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
 import { getUser } from '../services/AuthService';
 import { IRecipient } from '@/types';
 import { useDispatchRecipients } from '@/context';
@@ -49,10 +48,15 @@ export default function CreateRecipient() {
 
     const fname = event.currentTarget.fname.value.trim();
     const surname = event.currentTarget.surname.value.trim();
+    const email = event.currentTarget.email.value.trim();
+    const electricityMeterNumber =
+      event.currentTarget.electricityMeterNumber.value.trim();
 
     if (
       hackyRegex.test(fname) ||
       hackyRegex.test(surname) ||
+      hackyRegex.test(email) ||
+      hackyRegex.test(electricityMeterNumber) ||
       hackyRegex.test(mobileNumber)
     ) {
       setMessage('Invalid characters detected.');
@@ -94,7 +98,10 @@ export default function CreateRecipient() {
       country,
       countryCode,
       mobileNumber,
+      email,
+      electricityMeterNumber,
       senderId,
+      active: true,
       id: uuidv4(),
     };
 
@@ -115,11 +122,13 @@ export default function CreateRecipient() {
               payload,
             });
 
+            // if (searchParams?.has('return_url')) {
+            //   router.push(searchParams.get('return_url') ?? '/cart');
+            // } else {
             router.push(
-              `/select-deal/?recipientCountryCode=${countryCode}&${
-                searchParams && searchParams.toString()
-              }`
+              '/select-deal?recipientCountryCode=ZA&category=Shopping'
             );
+            // }
           }
         })
         .catch((error: any) => {
@@ -133,11 +142,11 @@ export default function CreateRecipient() {
           payload,
         });
 
-        router.push(
-          `/select-deal/?recipientCountryCode=${countryCode}&${
-            searchParams && searchParams.toString()
-          }`
-        );
+        // if (searchParams?.has('return_url')) {
+        //   router.push(searchParams.get('return_url') ?? '/cart');
+        // } else {
+        router.push('/select-deal?recipientCountryCode=ZA&category=Shopping');
+        // }
       } catch (error) {
         console.log(error);
         setMessage('Something went wrong. Please try again later.');
@@ -159,7 +168,7 @@ export default function CreateRecipient() {
             <form onSubmit={submitHandler}>
               <div className={styles.formElement}>
                 <label htmlFor='fname'>
-                  First Name<span className={styles.required}>*</span>:
+                  First name<span className={styles.required}>*</span>:
                 </label>
                 <TextField
                   autoComplete='off'
@@ -174,7 +183,7 @@ export default function CreateRecipient() {
               </div>
               <div className={styles.formElement}>
                 <label htmlFor='surname'>
-                  Last Name<span className={styles.required}>*</span>:
+                  Last name<span className={styles.required}>*</span>:
                 </label>
                 <TextField
                   autoComplete='off'
@@ -190,13 +199,42 @@ export default function CreateRecipient() {
 
               <div className={styles.formElement}>
                 <label htmlFor='mobileNumber'>
-                  Mobile Number<span className={styles.required}>*</span>:
+                  Mobile number (Airtime top-ups)
+                  <span className={styles.required}>*</span>:
                 </label>
                 <PhoneForm
                   setPhoneNumber={setMobileNumber}
                   setCountryCode={setCountryCode}
                   setCountry={setCountry}
                   defaultCountry='ZA'
+                />
+              </div>
+
+              <div className={styles.formElement}>
+                <label htmlFor='email'>Email address (optional)</label>
+                <TextField
+                  hiddenLabel
+                  type='email'
+                  id='email'
+                  defaultValue=''
+                  variant='outlined'
+                  name='email'
+                  style={{ width: '100%', backgroundColor: '#ffffff' }}
+                />
+              </div>
+
+              <div className={styles.formElement}>
+                <label htmlFor='electricityMeterNumber'>
+                  Electricity meter number (optional)
+                </label>
+                <TextField
+                  autoComplete='off'
+                  hiddenLabel
+                  id='electricityMeterNumber'
+                  defaultValue=''
+                  variant='outlined'
+                  name='electricityMeterNumber'
+                  style={{ width: '100%', backgroundColor: '#ffffff' }}
                 />
               </div>
 
@@ -208,20 +246,18 @@ export default function CreateRecipient() {
                   className={styles.actionButton}
                   value='Create Recipient'
                 />
-                <div>
+              </div>
+              {/* <div>
                   <p>
                     <Link href='/select-recipient'>
                       Select a recent recipient.
                     </Link>
                   </p>
-                </div>
-              </div>
+                </div> */}
             </form>
           </div>
         </div>
       </div>
-
-      <Nav />
     </main>
   );
 }

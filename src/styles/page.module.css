@@ -349,7 +349,7 @@ a.actionLink,
 }
 
 .cartRemoveButton {
-  padding: 16px;
+  padding-bottom: 32px;
 }
 
 .getStarted {
@@ -439,6 +439,10 @@ a.actionLink,
   border: 1px solid #000000;
 }
 
+.getStarted {
+  flex-direction: column;
+}
+
 /* Mobile */
 @media (max-width: 700px) {
   .main {
@@ -451,10 +455,6 @@ a.actionLink,
 
   .dealPanel {
     width: 100%;
-  }
-
-  .getStarted {
-    flex-direction: column;
   }
 
   .content {

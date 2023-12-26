@@ -5,7 +5,7 @@ import {
   ReactNode,
   Dispatch,
 } from 'react';
-import { IVoucher, ERedemptionStatus, ERetailStatus } from '@/types';
+import { IVoucher } from '@/types';
 import products from '@/data/denomination_lipaworld.json';
 import { v4 as uuid } from 'uuid';
 
@@ -95,32 +95,40 @@ interface VouchersProviderProps {
   children: ReactNode;
 }
 
-const parsedProducts = JSON.parse(JSON.stringify(products));
+const parsedProducts: any = JSON.parse(JSON.stringify(products));
 
-const mappedProducts = parsedProducts.map((product: any) => {
-  return {
-    ...product,
-    merchantId: product.merchant_id,
-    categories: [product.category],
-    merchantName: product.merchant_name,
-    countryCode: 'ZA',
-    dealId: product.product_id,
-    partnerName: product.channel_partner,
-    partnerId: product.partner_id,
-    voucherDescription: product.description,
-    voucherName: `${product.product_name} Voucher`,
-    voucherImageUrl:
-      product.voucher_image.length > 0
-        ? product.voucher_image
-        : '/partners/img/1voucher.png',
-    redemptionCountryCode: 'ZA',
-    redemptionCurrency: 'ZAR',
-    redemptionStatus: ERedemptionStatus.Active,
-    redemptionValues: [product.zar * 100],
-    retailStatus: ERetailStatus.Active,
-    termsAndConditions: product.terms,
-  };
-});
+const activeProducts = parsedProducts.filter(
+  (product: any) => product.status === 'Active'
+);
+
+const mappedProducts = activeProducts.map((product: any) => ({
+  merchantId: product.merchant_id,
+  categories: [product.category],
+  merchantName: product.merchant_name,
+  countryCode: 'ZA',
+  dealId: product.product_id,
+  partnerProductId: product.partner_product_id,
+  status: product.status,
+  redemptionInput: product.redemption_input,
+  redemptionType: product.redemption_type,
+  transactionFee: product.transaction_fee,
+  customAmount: product.custom_amount,
+  minimumAmount: product.minimum_amount,
+  maximumAmount: product.maximum_amount,
+  redemptionInstructions: product.redemption_instructions,
+  terms: product.terms,
+  partnerName: product.channel_partner,
+  partnerId: product.partner_id,
+  voucherDescription: product.description,
+  voucherName: `${product.product_name} Voucher`,
+  voucherImageUrl:
+    product.voucher_image?.length > 0
+      ? product.voucher_image
+      : '/partners/img/1voucher.png',
+  redemptionCountryCode: 'ZA',
+  redemptionCurrency: 'ZAR',
+  redemptionValues: [product.zar * 100],
+}));
 
 // Create a custom provider component that wraps the children with the vouchers context
 export const VouchersProvider = ({ children }: VouchersProviderProps) => {

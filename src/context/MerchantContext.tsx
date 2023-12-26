@@ -101,16 +101,18 @@ interface MerchantsProviderProps {
 
 const parsedProducts = JSON.parse(JSON.stringify(products));
 
-const mappedMerchants = parsedProducts.map((product: any) => {
-  return {
-    ...product,
-    merchantId: product.merchant_id,
-    categories: [product.category],
-    merchantName: product.merchant_name,
-    countryCode: 'ZA',
-    status: ERetailStatus.Active,
-  };
-});
+const mappedMerchants = parsedProducts
+  .filter((product: any) => product.status === 'Active')
+  .map((product: any) => {
+    return {
+      ...product,
+      merchantId: product.merchant_id,
+      categories: [product.category],
+      merchantName: product.merchant_name,
+      countryCode: 'ZA',
+      status: ERetailStatus.Active,
+    };
+  });
 
 // Create a custom provider component that wraps the children with the merchants context
 export const MerchantsProvider = ({ children }: MerchantsProviderProps) => {

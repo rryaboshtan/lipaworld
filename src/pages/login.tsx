@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import axios from 'axios';
-import { TextField } from '@mui/material';
+import { IRecipient } from '@/types';
+import { TextField, InputAdornment, IconButton } from '@mui/material';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
-import { useDispatchRecipients } from '@/context';
+import { useDispatchRecipients, useRecipients } from '@/context';
 
 import { setUserSession } from '../services/AuthService';
 import SideNav from '../components/sideNav/SideNav';
@@ -17,14 +21,27 @@ const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function Signin(): JSX.Element {
   const dispatchRecipients = useDispatchRecipients();
+  const recipients = useRecipients();
   const router = useRouter();
   const { query } = router;
   const { useremail } = query;
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const [message, setMessage] = useState<null | string>(null); // TODO: Add message validation
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
   );
+
+  useEffect(() => {
+    const params: URLSearchParams = new URLSearchParams(window.location.search);
+    console.log('params', params);
+    setSearchParams(params);
+  }, []);
 
   const hackyRegex =
     /<script|<\/script>|javascript:|<|>|onload=|onerror=|onmouseover=|onmouseout=|onfocus=|onblur=|onclick=|ondblclick=|onkeydown=|onkeypress=|onkeyup=|onsubmit=|onreset=|onselect=|onchange=|onloadstart=|onprogress=|onabort=|onloadend=|oncanplay=|oncanplaythrough=|ondurationchange=|onemptied=|onended=|onerror=|oninput=|oninvalid=|onpause=|onplay=|onplaying=|onprogress=|onratechange=|onreadystatechange=|onseeked=|onseeking=|onstalled=|onsuspend=|ontimeupdate=|onvolumechange=|onwaiting=/i;
@@ -67,6 +84,33 @@ export default function Signin(): JSX.Element {
       setUserSession(response.data.token, response.data.user);
 
       if (response.data.user) {
+        if (recipients.length > 0) {
+          const payload: IRecipient = {
+            name: recipients[0].name,
+            surname: recipients[0].surname,
+            country: recipients[0].country,
+            countryCode: recipients[0].countryCode,
+            mobileNumber: recipients[0].mobileNumber,
+            email: recipients[0].email ?? '',
+            electricityMeterNumber: recipients[0].electricityMeterNumber ?? '',
+            senderId: response.data.user.id,
+            active: recipients[0].active,
+            id: recipients[0].id,
+          };
+
+          mixpanel.track('Create Recipient from pre-login');
+
+          fetch(`${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/register`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+          }).then((response) => {
+            console.log('create hanging recipient response', response);
+          });
+        }
+
         const url = `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/recipients?userId=${response.data.user.id}`;
         try {
           const response2 = await axios.get(url);
@@ -82,11 +126,11 @@ export default function Signin(): JSX.Element {
 
       mixpanel.identify(response.data.user.email);
 
-      if (searchParams?.has('return_url')) {
-        router.push(searchParams.get('return_url') ?? '/cart');
-      } else {
-        router.push('/cart');
-      }
+      // if (searchParams?.has('return_url')) {
+      //   router.push(searchParams.get('return_url') ?? '/cart');
+      // } else {
+      router.push('/select-deal?recipientCountryCode=ZA&category=Airtime');
+      // }
     } catch (error: any) {
       if (error.response?.status === 401 || error.response?.status === 403) {
         setMessage('Invalid credentials');
@@ -120,21 +164,34 @@ export default function Signin(): JSX.Element {
                   variant='outlined'
                   name='email'
                   required
-                  style={{ width: '250px' }}
+                  style={{ width: '250px', backgroundColor: '#ffffff' }}
                 />
               </div>
+
               <div className={styles.formElement}>
-                <label htmlFor='password'>Password:</label>
+                <label htmlFor='password'>Password</label>
                 <TextField
                   autoComplete='off'
                   hiddenLabel
-                  type='password'
+                  type={showPassword ? 'text' : 'password'}
                   id='password'
                   defaultValue=''
                   variant='outlined'
                   name='password'
                   required
-                  style={{ width: '250px' }}
+                  style={{ width: '250px', backgroundColor: '#ffffff' }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position='end'>
+                        <IconButton
+                          aria-label='toggle password visibility'
+                          onClick={handleClickShowPassword}
+                        >
+                          {showPassword ? <Visibility /> : <VisibilityOff />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </div>
 
@@ -148,7 +205,7 @@ export default function Signin(): JSX.Element {
                 />
                 <div>
                   <p>
-                    Need an account? <Link href='/register'>Join Now</Link>{' '}
+                    New on Lipaworld? <Link href='/register'>Join Now</Link>{' '}
                   </p>
                 </div>
               </div>

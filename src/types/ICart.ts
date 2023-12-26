@@ -1,4 +1,5 @@
 import { IVoucher } from './IVoucher';
+import { IRecipient } from './IRecipient';
 
 export interface ICartItem {
   voucherId: string;
@@ -7,6 +8,7 @@ export interface ICartItem {
   deal: IVoucher;
   cartItemId: string;
   recipientId?: string;
+  productRecipient: IRecipient | null | undefined;
 }
 
 export interface ICart {

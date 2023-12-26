@@ -25,12 +25,21 @@ export interface IVoucher {
   voucherName: string;
   redemptionCountryCode: string;
   redemptionCurrency: string;
-  redemptionStatus: ERedemptionStatus;
   redemptionValues: number[];
+  redemptionType: string;
   retailStatus: ERetailStatus;
   serialNumber: string;
   subCategories: string[];
-  termsAndConditions: string;
   updatedBy: string;
   version: number;
+  partnerProductId: string;
+  status: string;
+  redemptionInput: string;
+  transactionFee: number | string;
+  customAmount: number;
+  minimumAmount: number;
+  redemptionInstructions: string;
+  terms: string;
+  recipientMobileNumber?: string;
+  recipientMeterNumber?: string;
 }

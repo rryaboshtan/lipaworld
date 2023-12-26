@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getUser } from '../services/AuthService';
 import { useRecipients } from '@/context';
 import Nav from '../components/nav/Nav';
-import RecipientButtons from '../components/recipientButtons/RecipientButtons';
+// import RecipientButtons from '../components/recipientButtons/RecipientButtons';
 import SideNav from '../components/sideNav/SideNav';
 import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
@@ -31,9 +31,7 @@ export default function SelectRecipient() {
   }, []);
 
   const createRecipientHandler = () => {
-    router.push(
-      `/create-recipient/?${searchParams && searchParams.toString()}`
-    );
+    router.push(`/create-recipient`);
   };
 
   return (
@@ -54,7 +52,7 @@ export default function SelectRecipient() {
                     <div key={index} className={styles.dealPanel}>
                       <div
                         className={` ${styles.amounts}`}
-                        style={{ marginLeft: '12px', marginRight: '12px' }}
+                        style={{ margin: '12px' }}
                       >
                         <div className={styles.dealVoucherName}>
                           {recipient.name} {recipient.surname}
@@ -74,11 +72,11 @@ export default function SelectRecipient() {
                           />
                         </div>
                       </div>
-                      <RecipientButtons
+                      {/* <RecipientButtons
                         isSelected={index === 0}
                         recipient={recipient}
                         setErrorMessage={setErrorMessage}
-                      />
+                      /> */}
                     </div>
                   )
               )
@@ -86,14 +84,10 @@ export default function SelectRecipient() {
               <div>
                 No recipients found. <br />
                 <br />
-                <Link href='create-recipient' className={styles.actionLink}>
+                <Link href={`/create-recipient`} className={styles.actionLink}>
                   Create a recipient
-                </Link>{' '}
-                or{' '}
-                <Link href='login' className={styles.actionLink}>
-                  Login
-                </Link>{' '}
-                to see your previous recipients.
+                </Link>
+                .
               </div>
             )}
           </div>

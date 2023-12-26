@@ -51,10 +51,10 @@ function CartTable({
                 </td>
                 <td className={styles.cartItemDescription}>
                   {renderMobileItemDescription(item)}
-                  <span className={`${styles.dealMerchant}`}>
+                  {/* <span className={`${styles.dealMerchant}`}>
                     ({item.deal.redemptionCurrency}{' '}
                     {(item.deal.redemptionValues[0] / 100).toFixed(2)})
-                  </span>
+                  </span> */}
                 </td>
                 <td className={styles.cartItemAmount}>
                   {renderMobileItemAmount(item)}
@@ -93,18 +93,13 @@ function CartTable({
       <>
         <div className={styles.dealVoucherName}>
           {item.quantity} x {item.deal.voucherName}
-        </div>
-        <div className={styles.redemptionText}>
-          <strong>
-            {item.deal.redemptionCurrency}{' '}
-            {(item.deal.redemptionValues[0] / 100).toFixed(2)}
-          </strong>
-        </div>
-        <div className={styles.redemptionText}>
-          {item.deal.voucherDescription}
-        </div>
-        <div className={styles.dealMerchant}>
-          Merchant: {item.deal.merchantName}
+          <div className={styles2.mobileAmount}>
+            ({item.deal.redemptionCurrency}{' '}
+            {(item.deal.redemptionValues[0] / 100).toFixed(2)})
+          </div>
+          <div className={styles2.recipientText}>
+            {`${item.productRecipient?.name} ${item.productRecipient?.surname}`}
+          </div>
         </div>
         <br />
       </>
@@ -132,7 +127,6 @@ function CartTable({
             cart.cartItems.map((item, index) => (
               <tr key={index} className={styles.cartItemRow}>
                 <td className={styles.cartItemQuantity}>
-                  <div className={styles.amountRedemption}>{item.quantity}</div>
                   <div className={styles.cartRemoveButton}>
                     <button
                       onClick={() => removeFromCartHandler(item.cartItemId)}
@@ -147,11 +141,15 @@ function CartTable({
                   </div>
                 </td>
                 <td className={styles.cartItemDescription}>
-                  {item.deal.voucherName}{' '}
+                  {item.quantity} x {item.deal.voucherName}{' '}
                   <span className={`${styles.dealMerchant}`}>
                     ({item.deal.redemptionCurrency}{' '}
                     {(item.deal.redemptionValues[0] / 100).toFixed(2)})
                   </span>
+                  <br />
+                  <div className={styles2.recipientText}>
+                    {`${item.productRecipient?.name} ${item.productRecipient?.surname}`}
+                  </div>
                 </td>
                 <td className={styles.cartItemAmount}>
                   {renderDesktopItemAmount(item)}

@@ -1,8 +1,9 @@
 import React, { Dispatch, SetStateAction, useState } from 'react';
 import styles from './VoucherCard.module.scss';
-import { IVoucher } from '@/types';
+import { IRecipient, IVoucher } from '@/types';
+import RecipientSelect from '@components/recipientSelect/RecipientSelect';
+import RedemptionInput from '@components/redemptionInput/RedemptionInput';
 import CartButtons from '@components/cartButtons/CartButtons';
-import { TextField } from '@mui/material';
 
 interface Props {
   voucher: IVoucher;
@@ -20,10 +21,10 @@ const VoucherCard: React.FC<Props> = ({
   currencyRate,
 }) => {
   const [quantity, setQuantity] = useState(voucherQuantity);
-
-  // const resendCartHandler = () => {
-
-  // }
+  const [redemptionInputValue, setRedemptionInputValue] = useState('');
+  const [productRecipient, setProductRecipient] = useState<IRecipient | null>(
+    null
+  );
 
   return (
     <div
@@ -55,9 +56,9 @@ const VoucherCard: React.FC<Props> = ({
         <div className={styles.amountRedemptionj}>
           {voucher.voucherDescription}
         </div>
-        <div className={styles.dealMerchant}>
+        {/* <div className={styles.dealMerchant}>
           Merchant: {voucher.merchantName}
-        </div>
+        </div> */}
       </div>
       {isHistory ? (
         <>
@@ -67,25 +68,28 @@ const VoucherCard: React.FC<Props> = ({
             setErrorMessage={setErrorMessage}
             quantity={quantity}
             isHistory={isHistory}
+            setProductRecipient={setProductRecipient}
           />
         </>
       ) : (
         <>
-          <TextField
-            id='outlined-number'
-            label='Quantity'
-            type='number'
-            size='small'
-            value={quantity}
-            onChange={(e) => setQuantity(+e.target.value)}
-            sx={{
-              marginTop: '16px',
-            }}
+          <RecipientSelect
+            productRecipient={productRecipient}
+            setProductRecipient={setProductRecipient}
+          />
+          <RedemptionInput
+            voucher={voucher}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            redemptionInputValue={redemptionInputValue}
+            setRedemptionInputValue={setRedemptionInputValue}
           />
           <CartButtons
             deal={voucher}
             setErrorMessage={setErrorMessage}
             quantity={quantity}
+            productRecipient={productRecipient}
+            setProductRecipient={setProductRecipient}
           />
         </>
       )}

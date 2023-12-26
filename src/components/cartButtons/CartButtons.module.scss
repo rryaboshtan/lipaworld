@@ -16,6 +16,11 @@
   min-width: 100px;
 }
 
+.cart:disabled {
+  color: #ffffff;
+  background-color: lightslategrey;
+}
+
 .cartAdded {
   background-color: #ffffff;
   color: darkslategrey;

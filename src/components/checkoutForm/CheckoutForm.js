@@ -45,10 +45,10 @@ export default function CheckoutForm({ user }) {
     // redirected to the `return_url`.
     if (error.type === 'card_error' || error.type === 'validation_error') {
       setMessage(error.message);
-      mixpanel.track(`Payment error: ${error.message}`);      
+      mixpanel.track(`Payment error: ${error.message}`);
     } else {
       setMessage('An unexpected error occured.');
-      mixpanel.track(`Payment error: An unexpected error occured.`);      
+      mixpanel.track(`Payment error: An unexpected error occured.`);
     }
 
     setIsLoading(false);

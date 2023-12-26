@@ -11,14 +11,15 @@ interface Props {
 const RecipientCard: React.FC<Props> = ({ recipient }) => {
   return (
     <div className={styles.container}>
-      <div
-        className={` ${styles.wrapper}`}
-        style={{ marginLeft: '12px', marginRight: '12px' }}
-      >
+      <div className={` ${styles.wrapper}`} style={{ margin: '12px' }}>
         <div className={styles.name}>
           {recipient.name} {recipient.surname}
         </div>
         <div>Mobile Number: {recipient.mobileNumber}</div>
+        {recipient.email && <div>Email: {recipient.email}</div>}
+        {recipient.electricityMeterNumber && (
+          <div>Meter Number: {recipient.electricityMeterNumber}</div>
+        )}
         <div style={{ marginTop: '8px' }}>
           <Img
             height={10}

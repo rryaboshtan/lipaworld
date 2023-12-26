@@ -1,7 +1,5 @@
-import { useEffect, useState } from 'react';
 import dotenv from 'dotenv';
 import type { AppProps } from 'next/app';
-// import { loadStripe, Stripe } from '@stripe/stripe-js';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import mixpanel from 'mixpanel-browser';
@@ -16,7 +14,6 @@ import {
 } from '@/context/index';
 
 import '@/styles/globals.css';
-
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import Script from 'next/script';
@@ -27,22 +24,6 @@ config.autoAddCss = false;
 const queryClient = new QueryClient();
 
 export default function App({ Component, pageProps }: AppProps) {
-  // const [stripePromise, setStripePromise] =
-  //   useState<Promise<Stripe | null> | null>(null);
-
-  // useEffect(() => {
-  //   try {
-  //     fetch(`${process.env.NEXT_PUBLIC_STRIPE_API_URL}/config`).then(
-  //       async (r) => {
-  //         const { publishableKey } = await r.json();
-  //         setStripePromise(loadStripe(publishableKey));
-  //       }
-  //     );
-  //   } catch (err) {
-  //     console.log('err', err);
-  //   }
-  // }, []);
-
   mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_KEY || '', {
     debug: true,
     track_pageview: true,
@@ -53,21 +34,13 @@ export default function App({ Component, pageProps }: AppProps) {
     'Event Type': 'Test implementation',
   });
 
-  // const initialOptions = {
-  //   clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-  //   buyerCountry: 'en_US',
-  //   currency: 'USD',
-  //   debug: true,
-  //   enableFunding: 'venmo,card,credit',
-  // };
-
   const initialOptions = {
     'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
     clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
     currency: 'USD',
     intent: 'capture',
     enableFunding: 'venmo,card,credit',
-    debug: true,
+    // debug: true,
     // buyerCountry: 'en_US',
   };
 

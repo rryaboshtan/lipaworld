@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import mobileDetect from 'mobile-detect';
-import { useTransaction } from '@/context';
+import { useTransaction, useDispatchTransaction } from '@/context';
 import { getUser } from '../services/AuthService';
 import Nav from '../components/nav/Nav';
 import { Montserrat } from 'next/font/google';
@@ -14,7 +14,8 @@ import styles from '../styles/page.module.css';
 import mixpanel from 'mixpanel-browser';
 dotenv.config();
 
-export default function Completion(props) {
+export default function Completion() {
+  let voucherHandled = false;
   const router = useRouter();
 
   let cart = null;
@@ -30,6 +31,8 @@ export default function Completion(props) {
   }
 
   const transaction = useTransaction();
+  const dispatchTransaction = useDispatchTransaction;
+
   const user = getUser();
   const name = user !== 'undefined' && user ? user.name : '';
   const surname = user !== 'undefined' && user ? user.surname : '';
@@ -42,12 +45,11 @@ export default function Completion(props) {
   const [pinReady, setPinReady] = useState(false);
   const [intentStatus, setIntentStatus] = useState('');
   const [vouchers, setVouchers] = useState(null);
-  const [pinShared, setPinShared] = useState(false);
   const [isMobile, setIsMobile] = useState(null);
 
   const getMoreVouchers = () => {
     sessionStorage.removeItem('cart');
-    router.push('/select-deal?recipientCountryCode=ZA&category=Fuel');
+    router.push('/select-deal?recipientCountryCode=ZA&category=Shopping');
   };
 
   if (typeof window !== 'undefined' && isMobile === null) {
@@ -57,7 +59,114 @@ export default function Completion(props) {
     }
   }
 
+  useEffect(() => {
+    if (vouchers && vouchers.length > 0) {
+      setVoucherMessageBody(
+        <>
+          Purchased vouchers are now ready:
+          <br />
+          <br />
+          {vouchers.map((item) => {
+            return item.error ? (
+              <p key={item.dealId}>
+                Something went wrong with this item. Please try again later.
+              </p>
+            ) : item.deal.redemptionType === 'PIN' ? (
+              <div key={item.dealId}>
+                {item.quantity} x {item.deal.redemptionCurrency}{' '}
+                {(item.redemptionUnitValue / 100).toFixed(2)}{' '}
+                {item.deal.voucherName} voucher at {item.deal.merchantName}
+                <br />
+                <br />
+                {item.vouchers.map((voucher) => (
+                  <p key={voucher}>
+                    <strong>PIN: {voucher.pin}</strong>
+                    <br />
+                  </p>
+                ))}
+                <br /> <br />
+                {item.deal.voucherDescription && (
+                  <small>Description: {item.deal.voucherDescription}</small>
+                )}
+                <br />
+                {item.deal.terms && (
+                  <small>Terms &amp; Conditions: {item.deal.terms}</small>
+                )}
+                <br />
+                <br />
+                <p>
+                  <input
+                    type='button'
+                    className={styles.actionButton}
+                    value={`Send message to ${item.productRecipient.name} using WhatsApp`}
+                    onClick={() => sendPinWhatsAppMessage(item)}
+                  />
+                  {/* <input
+                    type='button'
+                    className={styles.actionButton}
+                    value={`Send message to ${item.productRecipient.name} using Email`}
+                    onClick={()=>sendEmail(item)}
+                  /> */}
+                  {isMobile && (
+                    <input
+                      type='button'
+                      id='sendSmsId'
+                      className={styles.actionButton}
+                      value={`Send message to ${item.productRecipient.name} using SMS`}
+                      onClick={() => sendPinSmsMessage(item)}
+                    />
+                  )}
+                </p>
+              </div>
+            ) : (
+              <div key={item.dealId}>
+                {item.quantity} x {item.deal.redemptionCurrency}{' '}
+                {(item.redemptionUnitValue / 100).toFixed(2)}{' '}
+                {item.deal.voucherName} was topped-up to{' '}
+                {item.productRecipient.mobileNumber}
+                <br />
+                {item.deal.voucherDescription && (
+                  <small>Description: {item.deal.voucherDescription}</small>
+                )}
+                <br />
+                {item.deal.terms && (
+                  <small>Terms &amp; Conditions: {item.deal.terms}</small>
+                )}
+                <br />
+                <br />
+                <p>
+                  <input
+                    type='button'
+                    className={styles.actionButton}
+                    value={`Send message to ${item.productRecipient.name} using WhatsApp`}
+                    onClick={() => sendTopUpWhatsAppMessage(item)}
+                  />
+                  {/* <input
+                    type='button'
+                    className={styles.actionButton}
+                    value={`Send message to ${item.productRecipient.name} using Email`}
+                    onClick={sendEmail}
+                  />*/}
+                  {isMobile && (
+                    <input
+                      type='button'
+                      id='sendSmsId'
+                      className={styles.actionButton}
+                      value={`Send message to ${item.productRecipient.name} using SMS`}
+                      onClick={() => sendTopUpSmsMessage(item)}
+                    />
+                  )}
+                </p>
+              </div>
+            );
+          })}
+        </>
+      );
+    }
+  }, [vouchers]);
+
   const voucherHandler = () => {
+    voucherHandled = true;
     try {
       console.log('Process VOUCHER');
 
@@ -71,48 +180,20 @@ export default function Completion(props) {
       const requestBody = {
         transactionId: transaction.transactionId,
         cart,
-        recipientId: recipients[0].id,
-        senderEmail: user.email,
+        sender: user,
       };
 
       const url = `${createVoucherUrl}/extractvouchers`;
-
+      // const url = `http://localhost:5019/extractvouchers`;
       axios.post(url, requestBody, requestConfig).then((response) => {
-        console.log('response', response.data);
+        console.log('response from vouchers api', response.data);
         setVouchers(response.data.cart.cartItems);
-        setVoucherMessageBody(
-          <>
-            {recipients[0].name} {recipients[0].surname} can now redeem these
-            vouchers:
-            <br />
-            <br />
-            {response.data.cart.cartItems.map((item) => {
-              return (
-                <p key={item.voucherNumber}>
-                  {item.quantity} x {item.deal.redemptionCurrency}{' '}
-                  {(item.redemptionUnitValue / 100).toFixed(2)}{' '}
-                  {item.deal.voucherName} voucher at {item.deal.merchantName}
-                  <br />
-                  <br />
-                  <strong>PIN: {item.voucherNumber}</strong>
-                  <br /> <br />
-                  {item.deal.voucherDescription && (
-                    <small>Description: {item.deal.voucherDescription}</small>
-                  )}
-                  <br />
-                  {item.deal.termsAndConditions && (
-                    <small>
-                      Terms &amp; Conditions: {item.deal.termsAndConditions}
-                    </small>
-                  )}
-                  <br />
-                  <br />
-                </p>
-              );
-            })}
-          </>
-        );
+
         setPinReady(true);
+        // dispatchTransaction({
+        //   type: 'UPDATE_TRANSACTION',
+        //   payload: { ...transaction, cart: response.data.cart },
+        // });
       });
     } catch (error) {
       console.log('error', error);
@@ -127,14 +208,16 @@ export default function Completion(props) {
       setIntentStatus('succeeded');
       mixpanel.track(`Successful Payment`);
 
-      voucherHandler();
       setVoucherMessageBody(
         <p>
           <br />
-          Processing {recipients[0].name} {recipients[0].surname}
-          &apos;s voucher. Hold on tight ...
+          Processing vouchers. Hold on tight ...
         </p>
       );
+
+      if (!voucherHandled) {
+        voucherHandler();
+      }
 
       setMessageBody(
         <>
@@ -150,77 +233,120 @@ export default function Completion(props) {
     }
   }, []);
 
-  const sendWhatsAppMessage = () => {
-    mixpanel.track(`Sent WhatsApp message to a recipient with voucher`);
-    const cartItems = vouchers.map((item) => {
-      const description = document.createElement('div');
-      description.innerHTML = item.deal.voucherDescription;
-      const termsAndConditions = document.createElement('div');
-      termsAndConditions.innerHTML = item.deal.termsAndConditions;
+  const sendPinWhatsAppMessage = (item) => {
+    const description = document.createElement('div');
+    description.innerHTML = item.deal.voucherDescription;
+    const termsAndConditions = document.createElement('div');
+    termsAndConditions.innerHTML = item.deal.terms;
 
+    mixpanel.track(`Sent WhatsApp message to a recipient with Pin voucher`);
+    const cartItems = item.vouchers.map((itemVoucher) => {
       return `
-        ${item.quantity} x ${item.deal.redemptionCurrency}${(
-        item.redemptionUnitValue / 100
-      ).toFixed(2)} *${item.deal.voucherName}* voucher at ${
-        item.deal.merchantName
-      }
-      
-        *PIN: ${item.voucherNumber}*
-        
-        Description: ${description.innerText}
-      `;
+        *PIN: ${itemVoucher.pin}*
+        `;
     });
 
-    const message = `Congratulations ${recipients[0].name} ${
-      recipients[0].surname
-    }. You have received digital vouchers from ${name} ${surname}. Kindly redeem using voucher pins below:\n\n${cartItems.join(
+    const message = `Congratulations ${item.productRecipient.name} ${
+      item.productRecipient.surname
+    }. You have received digital vouchers from ${name}.\n\n ${
+      item.quantity
+    } x ${item.deal.redemptionCurrency}${(
+      item.redemptionUnitValue / 100
+    ).toFixed(2)} *${item.deal.voucherName}* from ${
+      item.deal.merchantName
+    }.{' '}\n\nDetails:\n\n${cartItems.join(
       '\n\n'
-    )} Terms & Conditions: on lipaworld.com`;
-
-    const whatsAppShareBlock = `https://wa.me/${recipients[0].mobileNumber.substring(
-      1,
-      20
-    )}?text=${encodeURIComponent(message)}`;
-
+    )}{' '}${description}\n\n ${termsAndConditions}. Terms & Conditions: on www.lipaworld.com`;
+    const whatsAppShareBlock = `https://api.whatsapp.com/send/?text=${message}&type=custom_url&app_absent=0`;
     window.open(whatsAppShareBlock, '_blank');
-    setPinShared(true);
   };
 
-  const sendSmsMessage = () => {
+  const sendPinSmsMessage = () => {
     mixpanel.track(`Sent SMS to a recipient with voucher`);
 
-    const cartItems = vouchers.map((item) => {
-      const description = document.createElement('div');
-      description.innerHTML = item.deal.voucherDescription;
-      const termsAndConditions = document.createElement('div');
-      termsAndConditions.innerHTML = item.deal.termsAndConditions;
+    const description = document.createElement('div');
+    description.innerHTML = item.deal.voucherDescription;
+    const termsAndConditions = document.createElement('div');
+    termsAndConditions.innerHTML = item.deal.terms;
 
+    mixpanel.track(`Sent WhatsApp message to a recipient with Pin voucher`);
+    const cartItems = item.vouchers.map((itemVoucher) => {
       return `
-        ${item.quantity} x ${item.deal.redemptionCurrency}${(
-        item.redemptionUnitValue / 100
-      ).toFixed(2)} ${item.deal.voucherName} voucher at ${
-        item.deal.merchantName
-      }
-      
-        PIN: ${item.voucherNumber}
-        
-        Description: ${description.innerText}
-      `;
+        *PIN: ${itemVoucher.pin}*
+        `;
     });
 
-    const message = `Congratulations ${recipients[0].name} ${
-      recipients[0].surname
-    }. You have received digital vouchers from ${name} ${surname}. Kindly redeem using voucher pins below:\n\n${cartItems.join(
+    const message = `Congratulations ${item.productRecipient.name} ${
+      item.productRecipient.surname
+    }. You have received digital vouchers from ${name}.\n\n ${
+      item.quantity
+    } x ${item.deal.redemptionCurrency}${(
+      item.redemptionUnitValue / 100
+    ).toFixed(2)} *${item.deal.voucherName}* from ${
+      item.deal.merchantName
+    }.{' '}\n\nDetails below:\n\n${cartItems.join(
       '\n\n'
-    )} Terms & Conditions: on lipaworld.com`;
+    )}${description}\n\n ${termsAndConditions} Terms & Conditions: on www.lipaworld.com`;
 
-    const smsShareBlock = `sms:${recipients[0].mobileNumber.substring(
-      1,
-      20
-    )}?body=${encodeURIComponent(message)}`;
+    const smsShareBlock = `sms:${
+      item.productRecipient.mobileNumber
+    }?body=${encodeURIComponent(message)}`;
 
     window.open(smsShareBlock, '_blank');
-    setPinShared(true);
+  };
+
+  const sendTopUpWhatsAppMessage = (item) => {
+    const description = document.createElement('div');
+    description.innerHTML = item.deal.voucherDescription;
+    const termsAndConditions = document.createElement('div');
+    termsAndConditions.innerHTML = item.deal.terms;
+
+    mixpanel.track(`Sent WhatsApp message to a recipient with top-up voucher`);
+
+    const message = `Congratulations ${item.productRecipient.name} ${
+      item.productRecipient.surname
+    }. You have received digital top-up vouchers from ${name}.\n\n ${
+      item.quantity
+    } x ${item.deal.redemptionCurrency}${(
+      item.redemptionUnitValue / 100
+    ).toFixed(2)} *${item.deal.voucherName}* from ${
+      item.deal.merchantName
+    }.{' '}\n\nDescription below:\n\n${
+      item.deal.voucherDescription
+    }\n\n Terms below:\n\n${
+      item.deal.terms
+    } Lipaworld Terms & Conditions: on www.lipaworld.com`;
+
+    const whatsAppShareBlockTopUp = `https://api.whatsapp.com/send/?text=${message}&type=custom_url&app_absent=0`;
+
+    window.open(whatsAppShareBlockTopUp, '_blank');
+  };
+
+  const sendTopUpSmsMessage = () => {
+    mixpanel.track(`Sent SMS to a recipient with voucher`);
+
+    const description = document.createElement('div');
+    description.innerHTML = item.deal.voucherDescription;
+    const termsAndConditions = document.createElement('div');
+    termsAndConditions.innerHTML = item.deal.terms;
+
+    mixpanel.track(`Sent WhatsApp message to a recipient with top-up voucher`);
+
+    const message = `Congratulations ${item.productRecipient.name} ${
+      item.productRecipient.surname
+    }. You have received digital top-up vouchers from ${name}.\n\n ${
+      item.quantity
+    } x ${item.deal.redemptionCurrency}${(
+      item.redemptionUnitValue / 100
+    ).toFixed(2)} *${item.deal.voucherName}* from ${
+      item.deal.merchantName
+    }\n\nDetails below:\n\n${description}\n\n ${termsAndConditions} Terms & Conditions: on www.lipaworld.com`;
+
+    const smsShareBlock = `sms:${
+      item.productRecipient.mobileNumber
+    }?body=${encodeURIComponent(message)}`;
+
+    window.open(smsShareBlock, '_blank');
   };
 
   const getMessageBodyId = useMemo(() => {
@@ -238,9 +364,6 @@ export default function Completion(props) {
       <NavMobile />
 
       <div className={styles.contentBody}>
-        {/* {intentStatus === 'succeeded' && (
-          <div className={styles.pageHeading}>Thank you, {name}!</div>
-        )} */}
         <div
           id={getMessageBodyId}
           role='alert'
@@ -268,33 +391,13 @@ export default function Completion(props) {
         {pinReady && (
           <>
             <p></p>
-            <p>
-              Click below to share the details using your favourite messaging
-              app.
-            </p>
+
             <input
               type='button'
               className={styles.actionButton}
-              value='Send Voucher PIN using WhatsApp'
-              onClick={sendWhatsAppMessage}
+              value='Buy more Vouchers'
+              onClick={getMoreVouchers}
             />
-            {isMobile && (
-              <input
-                type='button'
-                id='sendSmsId'
-                className={styles.actionButton}
-                value='Send Voucher PIN on SMS'
-                onClick={sendSmsMessage}
-              />
-            )}
-            {pinShared && (
-              <input
-                type='button'
-                className={styles.actionButton}
-                value='Buy more Vouchers'
-                onClick={getMoreVouchers}
-              />
-            )}
           </>
         )}
         <p></p>

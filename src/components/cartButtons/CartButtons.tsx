@@ -1,42 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { Dispatch } from 'react';
 import { useRouter } from 'next/router';
-import {
-  // useVouchers,
-  // useCountries,
-  // useDispatchTransaction,
-  // useRecipients,
-  useCart,
-  useDispatchCart,
-} from '@/context';
-import { IVoucher } from '@/types';
+import { getUser } from '@/services/AuthService';
+import { useDispatchCart } from '@/context';
+import { IVoucher, IRecipient } from '@/types';
 import styles from './CartButtons.module.scss';
 
 interface ICartButtonsProps {
   deal: IVoucher;
   setErrorMessage: React.Dispatch<React.SetStateAction<string | null>>;
-  quantity: number
-  isHistory?: boolean
+  quantity: number;
+  isHistory?: boolean;
+  disabled?: boolean;
+  productRecipient?: IRecipient | null;
+  setProductRecipient: Dispatch<IRecipient | null>;
 }
 
-function CartButtons({ deal, setErrorMessage, quantity, isHistory }: ICartButtonsProps) {
-  const [isCarted, setIsCarted] = useState<boolean>(false);
+function CartButtons({
+  deal,
+  setErrorMessage,
+  quantity,
+  isHistory,
+  productRecipient,
+  setProductRecipient,
+}: ICartButtonsProps) {
   const dispatchCart = useDispatchCart();
-  const cart = useCart();
-
+  const user = getUser();
   const router = useRouter();
 
-  const routeToCart = () => {
-    router.push(`/cart`);
-  };
+  const readyForCart = user?.name && productRecipient;
 
-  const addtoCartHandler = (
-    deal: IVoucher,
-    amount: number
-  ) => {
+  const addtoCartHandler = (deal: IVoucher, amount: number) => {
     console.log('ADD TO CART', { ...deal, quantity: quantity });
 
     try {
-      if (amount && quantity && deal) {
+      const allCartDetails = amount && quantity && deal && productRecipient;
+      if (allCartDetails) {
         dispatchCart({
           type: 'ADD_CART_ITEM',
           payload: {
@@ -45,11 +43,12 @@ function CartButtons({ deal, setErrorMessage, quantity, isHistory }: ICartButton
             quantity,
             deal: deal,
             cartItemId: `${deal.dealId}-${amount}`,
+            productRecipient: productRecipient,
           },
         });
+        setProductRecipient(null);
       } else {
-        console.log('ERROR');
-        throw new Error('Missing important order details.');
+        setErrorMessage('Missing important order details.');
       }
     } catch (error) {
       console.log(error);
@@ -57,46 +56,25 @@ function CartButtons({ deal, setErrorMessage, quantity, isHistory }: ICartButton
     }
   };
 
-  
   const resendHandler = () => {
-    addtoCartHandler(deal, deal.redemptionValues[0])
-    router.push(`/cart`);    
-  }
-  
-  useEffect(() => {
-    console.log('CART ITEMS', cart?.cartItems);
-    if (cart && cart.cartItems.length > 0 && deal.dealId) {
-      cart.cartItems.find((item) => item.deal.dealId === deal.dealId)
-        ? setIsCarted(true)
-        : setIsCarted(false);
-    }
-  }, [cart?.cartItems, deal]);
+    addtoCartHandler(deal, deal.redemptionValues[0]);
+    router.push(`/cart`);
+  };
 
   return (
     <div className={styles.cartHolder}>
-      {isHistory &&
-       <button
-        className={styles.cart}
-        onClick={() => resendHandler()}
-       >
-        Resend
-       </button>
-      }
-      {!isCarted ? (
-        <button
-          className={styles.cart}
-          onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
-        >
-          Add to Cart
+      {isHistory && (
+        <button className={styles.cart} onClick={() => resendHandler()}>
+          Resend
         </button>
-      ) : (
-        <>
-          <button className={styles.cartAdded}>Added to Cart</button>
-          <button className={styles.cart} onClick={routeToCart}>
-            Go to Cart
-          </button>
-        </>
       )}
+      <button
+        className={styles.cart}
+        onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
+        disabled={!readyForCart}
+      >
+        Add to Cart
+      </button>
     </div>
   );
 }

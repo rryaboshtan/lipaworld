@@ -7,7 +7,7 @@ import {
   getToken,
   setUserSession,
   resetUserSession,
-} from '../../services/AuthService';
+} from '@services/AuthService';
 import { useDispatchCart, useDispatchTransaction } from '@/context';
 import styles from './Nav.module.scss';
 
