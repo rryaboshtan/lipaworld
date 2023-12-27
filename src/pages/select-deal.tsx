@@ -20,7 +20,10 @@ export default function SelectDeal() {
 
   const [currencyRate, setCurrencyRate] = useState<number>(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [categoryList, setCategoryList] = useState<string[]>([]);
+  const [headingPlaceholder, setHeadingPlaceholder] = useState<string | null>(
+    null
+  );
+
   const [filteredVouchers, setFilteredVouchers] = useState<IVoucher[]>([]);
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
@@ -32,7 +35,7 @@ export default function SelectDeal() {
   }, []);
 
   useEffect(() => {
-    if (countries && recipientCountryCode) {
+    if (countries && recipientCountryCode && merchantId) {
       const countryCode =
         recipients.length === 0 ? 'ZA' : recipients[0].countryCode;
       const { rate } = countries[countryCode];
@@ -45,70 +48,89 @@ export default function SelectDeal() {
       const matchingVouchers = vouchers.filter(
         (voucher) =>
           voucher.status === 'Active' &&
-          (!recipientCountryCode ||
-            voucher?.redemptionCountryCode === recipientCountryCode) &&
-          (!category || voucher.categories.includes(category as string)) &&
-          (!merchantId || voucher.merchantId === (merchantId as string))
+          voucher?.redemptionCountryCode === recipientCountryCode &&
+          voucher.merchantId === merchantId
       );
-
-      console.log('matchingVouchers', matchingVouchers);
-      setFilteredVouchers(matchingVouchers);
-
-      if (matchingVouchers.length === 0) {
-        // setErrorMessage(`No matching vouchers found.`);
-        const list = vouchers
-          .filter(
-            (merchant) =>
-              merchant.redemptionCountryCode === recipientCountryCode &&
-              merchant.status === 'Active' &&
-              merchant.categories.includes('Shopping')
-          )
-          .map((merchant) => merchant.categories)
-          .flat();
-        setCategoryList(list);
+      if (matchingVouchers.length > 0) {
+        setHeadingPlaceholder(matchingVouchers[0].merchantName);
+        setFilteredVouchers(matchingVouchers);
+      } else {
+        setErrorMessage(
+          `No matching vouchers found for Merchant: "${merchantId}".`
+        );
+        const list = vouchers.filter(
+          (voucher) =>
+            voucher.status === 'Active' &&
+            voucher.redemptionCountryCode === recipientCountryCode &&
+            voucher.merchantName === 'MTN'
+        );
+        setHeadingPlaceholder('MTN');
+        setFilteredVouchers(list);
       }
     } else {
-      console.log('ERROR', recipientCountryCode, category, merchantId);
+      console.log('ERROR', recipientCountryCode, merchantId);
     }
-  }, [
-    vouchers,
-    merchantId,
-    category,
-    recipientCountryCode,
-    countries,
-    recipients,
-  ]);
+  }, [vouchers, merchantId, recipientCountryCode, countries, recipients]);
+
+  useEffect(() => {
+    if (countries && recipientCountryCode && category) {
+      const countryCode =
+        recipients.length === 0 ? 'ZA' : recipients[0].countryCode;
+      const { rate } = countries[countryCode];
+      if (rate) {
+        setCurrencyRate(rate);
+      }
+
+      setErrorMessage(null);
+
+      const matchingVouchers = vouchers.filter(
+        (voucher) =>
+          voucher.status === 'Active' &&
+          voucher?.redemptionCountryCode === recipientCountryCode &&
+          voucher.categories.includes(category as string)
+      );
+      if (matchingVouchers.length > 0) {
+        setHeadingPlaceholder(matchingVouchers[0].categories[0]);
+        setFilteredVouchers(matchingVouchers);
+      } else {
+        setErrorMessage(`No matching vouchers found for "${category}".`);
+        const list = vouchers.filter(
+          (voucher) =>
+            voucher.status === 'Active' &&
+            voucher.redemptionCountryCode === recipientCountryCode &&
+            voucher.categories.includes('Shopping')
+        );
+        setHeadingPlaceholder('Shopping');
+        setFilteredVouchers(list);
+      }
+    } else {
+      console.log('ERROR', recipientCountryCode, category);
+    }
+  }, [vouchers, category, recipientCountryCode, countries, recipients]);
 
   return (
     <main className={`${montserrat.className} ${styles.main}`}>
       <NavMobile withCart={true} />
 
       <div className={styles.contentBody}>
-        {errorMessage && (
-          <div className={styles.navSidedBody}>
-            <SideNav />
-            <div className={styles.errorMessage}>
-              <p>{errorMessage}</p>
-              <br />
-            </div>
-          </div>
-        )}
         {filteredVouchers && (
-          <div>
-            <p></p>
-          </div>
-        )}
-        {!errorMessage && filteredVouchers && (
           <div className={styles.navSidedBody}>
             <SideNav />
 
             <div className={styles.dealHolder}>
-              {category && (
+              <div
+                className={styles.errorMessage}
+                style={{ margin: '0 0 1rem 1rem' }}
+              >
+                <p>{errorMessage}</p>
+                <br />
+              </div>
+              {headingPlaceholder && (
                 <div
                   className={styles.pageHeading}
                   style={{ margin: '0 0 1.5rem 1rem' }}
                 >
-                  {category} vouchers
+                  {headingPlaceholder} vouchers
                 </div>
               )}
               {filteredVouchers.map((voucher, index) => (
