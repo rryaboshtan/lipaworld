@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { resetUserSession } from '../services/AuthService';
 import { useUser, useDispatchUser } from '@/context';
-import { useRouter } from 'next/router';
 import SideNav from '../components/sideNav/SideNav';
 import { Montserrat } from 'next/font/google';
 import NavMobile from '../components/navMobile/NavMobile';
@@ -15,9 +16,11 @@ export default function UserSettings() {
   const dispatchUser = useDispatchUser();
   // const [message, setMessage] = useState<null | string>(null);
 
-  if (user === null) {
-    router.push('/login');
-  }
+  useEffect(() => {
+    if (user === null) {
+      router.push('/login');
+    }
+  }, [user, router]);
 
   const logoutHandler = () => {
     dispatchUser({ type: 'SET_USER', payload: null });
