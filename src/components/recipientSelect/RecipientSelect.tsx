@@ -112,11 +112,8 @@ const RecipientSelect: React.FC<Props> = ({
         </div>
       ) : !user ? (
         <div className={` ${styles.wrapper}`}>
-          <Link
-            href={`/register/?return_url=${returnUrl}`}
-            className={styles.actionLink}
-          >
-            Join now
+          <Link href={`/login`} className={styles.actionLink}>
+            Sign in
           </Link>{' '}
           to create a recipient.
         </div>

@@ -41,7 +41,7 @@ export default function MyRecipients() {
       )
         .then((res) => res.json())
         .then((res: { recipients: IRecipient[] }) => {
-          if (isMounted) {
+          if (isMounted && res.recipients.length > 0) {
             dispatchRecipients({
               type: 'ADD_RECIPIENTS',
               payload: res.recipients,

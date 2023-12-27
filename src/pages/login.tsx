@@ -140,7 +140,7 @@ export default function Signin(): JSX.Element {
       // if (searchParams?.has('return_url')) {
       //   router.push(searchParams.get('return_url') ?? '/cart');
       // } else {
-      router.push('/select-deal?recipientCountryCode=ZA&category=Airtime');
+      router.push('/?recipientCountryCode=ZA');
       // }
     } catch (error: any) {
       if (error.response?.status === 401 || error.response?.status === 403) {
