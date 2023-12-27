@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import dotenv from 'dotenv';
 import { useRouter } from 'next/router';
 // import Img from 'next/image';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import { CreateOrderActions } from '@paypal/paypal-js';
 import {
   // useVouchers,
@@ -30,8 +30,8 @@ export default function Payment(props: any) {
   const router = useRouter();
   const transaction = useTransaction();
   const [intentSent, setIntentSent] = useState(false);
-  const user = getUser();
-  const name = user !== 'undefined' && user ? user.name : '';
+  const user = useUser();
+  const name = user?.name ?? '';
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
   );

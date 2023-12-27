@@ -12,7 +12,7 @@ import {
   useTransaction,
 } from '@/context';
 import { IVoucher, ICountry } from '@/types';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import Nav from '../components/nav/Nav';
 import SideNav from '../components/sideNav/SideNav';
 import NavMobile from '../components/navMobile/NavMobile';
@@ -54,8 +54,8 @@ export default function CartContainer() {
   const [cartProcessingFee, setCartProcessingFee] = useState<string>('0.00');
   const [cartSubTotalAmount, setCartSubTotalAmount] = useState<string>('0.00');
 
-  const user = getUser();
-  const name = user !== 'undefined' && user ? user.name : '';
+  const user = useUser();
+  const name = user ? user?.name : '';
 
   if (typeof window !== 'undefined' && isMobile === null) {
     const mobileCheck: any = new mobileDetect(window.navigator.userAgent);

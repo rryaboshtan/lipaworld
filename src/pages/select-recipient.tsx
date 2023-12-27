@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Img from 'next/image';
 import Link from 'next/link';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import { useRecipients } from '@/context';
 import Nav from '../components/nav/Nav';
 // import RecipientButtons from '../components/recipientButtons/RecipientButtons';
@@ -19,7 +19,7 @@ export default function SelectRecipient() {
   const recipients = useRecipients();
 
   const router = useRouter();
-  const user = getUser();
+  const user = useUser();
 
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null

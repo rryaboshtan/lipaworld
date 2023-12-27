@@ -9,18 +9,22 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
-import { useDispatchRecipients, useRecipients } from '@/context';
+import {
+  useDispatchRecipients,
+  useRecipients,
+  useDispatchUser,
+} from '@/context';
 
 import { setUserSession } from '../services/AuthService';
 import SideNav from '../components/sideNav/SideNav';
 import NavMobile from '../components/navMobile/NavMobile';
-import Nav from '../components/nav/Nav';
 import { Montserrat } from 'next/font/google';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
 
 export default function Signin(): JSX.Element {
   const dispatchRecipients = useDispatchRecipients();
+  const dispatchUser = useDispatchUser();
   const recipients = useRecipients();
   const router = useRouter();
   const { query } = router;
@@ -39,7 +43,6 @@ export default function Signin(): JSX.Element {
 
   useEffect(() => {
     const params: URLSearchParams = new URLSearchParams(window.location.search);
-    console.log('params', params);
     setSearchParams(params);
   }, []);
 
@@ -84,6 +87,11 @@ export default function Signin(): JSX.Element {
       setUserSession(response.data.token, response.data.user);
 
       if (response.data.user) {
+        dispatchUser({
+          type: 'SET_USER',
+          payload: response.data.user,
+        });
+
         if (recipients.length > 0) {
           const payload: IRecipient = {
             name: recipients[0].name,
@@ -100,21 +108,24 @@ export default function Signin(): JSX.Element {
 
           mixpanel.track('Create Recipient from pre-login');
 
-          fetch(`${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/register`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-          }).then((response) => {
-            console.log('create hanging recipient response', response);
+          await fetch(
+            `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/register`,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(payload),
+            }
+          ).catch((error) => {
+            console.log('error', error);
           });
         }
 
         const url = `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/recipients?userId=${response.data.user.id}`;
         try {
           const response2 = await axios.get(url);
-          console.log('start adding recipients');
+          // console.log('start adding recipients');
           dispatchRecipients({
             type: 'ADD_RECIPIENTS',
             payload: response2.data['recipients'],
@@ -205,7 +216,7 @@ export default function Signin(): JSX.Element {
                 />
                 <div>
                   <p>
-                    New on Lipaworld? <Link href='/register'>Join Now</Link>{' '}
+                    New on Lipaworld? <Link href='/register'>Join Now</Link>.
                   </p>
                 </div>
               </div>
@@ -213,8 +224,6 @@ export default function Signin(): JSX.Element {
           </div>
         </div>
       </div>
-
-      <Nav />
     </main>
   );
 }

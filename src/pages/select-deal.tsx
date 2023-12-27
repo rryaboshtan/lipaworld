@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useVouchers, useCountries, useRecipients } from '@/context';
 import { IVoucher, ICountry } from '@/types';
-import { getUser } from '@/services/AuthService';
-import Nav from '../components/nav/Nav';
 import SideNav from '../components/sideNav/SideNav';
 import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
@@ -27,9 +25,6 @@ export default function SelectDeal() {
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
   );
-
-  const user = getUser();
-  const name = user !== 'undefined' && user ? user.name : '';
 
   useEffect(() => {
     const params: URLSearchParams = new URLSearchParams(window.location.search);

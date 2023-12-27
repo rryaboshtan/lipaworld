@@ -161,24 +161,7 @@ interface RecipientsProviderProps {
   children: ReactNode;
 }
 
-const defaultRecipients: IRecipient[] = [
-  // {
-  //   name: 'Fikile',
-  //   surname: 'Mlangeni',
-  //   country: 'United States',
-  //   countryCode: 'US',
-  //   mobileNumber: '+12025550196',
-  //   senderId: 'xx',
-  // },
-  // {
-  //   name: 'Siyabonga',
-  //   surname: 'Zwakele',
-  //   country: 'South Africa',
-  //   countryCode: 'ZA',
-  //   mobileNumber: '+27712025550196',
-  //   senderId: 'xx',
-  // },
-];
+const defaultRecipients: IRecipient[] = [];
 
 // Create a custom provider component that wraps the children with the recipients context
 export const RecipientsProvider = ({ children }: RecipientsProviderProps) => {

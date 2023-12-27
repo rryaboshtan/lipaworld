@@ -1,17 +1,17 @@
 'use client';
 
-export const getUser = () => {
-  if (typeof window !== 'undefined') {
-    const user = window.sessionStorage.getItem('user');
-    if (!user) {
-      return null;
-    } else {
-      return JSON.parse(user);
-    }
-  } else {
-    return null;
-  }
-};
+// export const getUser = () => {
+//   if (typeof window !== 'undefined') {
+//     const user = window.sessionStorage.getItem('user');
+//     if (!user) {
+//       return null;
+//     } else {
+//       return JSON.parse(user);
+//     }
+//   } else {
+//     return null;
+//   }
+// };
 
 export const getToken = () => {
   if (typeof window !== 'undefined') {

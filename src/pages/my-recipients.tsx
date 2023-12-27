@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import { useDispatchRecipients, useRecipients } from '@/context';
-import Nav from '../components/nav/Nav';
 import SideNav from '../components/sideNav/SideNav';
 import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
@@ -21,7 +20,7 @@ export default function MyRecipients() {
   const dispatchRecipients = useDispatchRecipients();
 
   const router = useRouter();
-  const user = getUser();
+  const user = useUser();
 
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
     null
@@ -110,7 +109,6 @@ export default function MyRecipients() {
             />
           )}
         </div>
-        {/* <Nav /> */}
       </div>
     </main>
   );

@@ -10,6 +10,12 @@
         "**/?(*.)+(spec|test).[jt]s?(x)"
       ],
       "extends": ["plugin:testing-library/react"]
+    },
+    {
+      "files": ["**/*.spec.ts"],
+      "rules": {
+        "testing-library/prefer-screen-queries": "off"
+      }
     }
   ]
 }

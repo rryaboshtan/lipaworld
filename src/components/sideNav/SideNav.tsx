@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useMerchants, useRecipients } from '@/context';
-import { getUser } from '@services/AuthService';
-import { IMerchant, IRecipient } from '@/types';
+import { useMerchants } from '@/context';
+import { IMerchant } from '@/types';
+import SideNavUser from './SideNavUser';
 import styles from './SideNav.module.scss';
 import mixpanel from 'mixpanel-browser';
 
 function SideNav() {
   const merchants: IMerchant[] = useMerchants();
-  const recipients: IRecipient[] = useRecipients();
-  const user = getUser();
   const [categories, setCategories] = useState<string[]>([]);
   const [merchantList, setMerchantList] = useState<IMerchant[]>([]);
-  const [returnUrl, setReturnUrl] = useState('');
+  // const [returnUrl, setReturnUrl] = useState('');
 
-  useEffect(() => {
-    setReturnUrl(window.location.pathname + window.location.search);
-  });
+  // useEffect(() => {
+  //   setReturnUrl(window.location.pathname + window.location.search);
+  // }, []);
 
   useEffect(() => {
     if (merchants.length === 0) return;
@@ -64,53 +62,30 @@ function SideNav() {
     mixpanel.track(`Voucher Selection: ${type} = ${value}`);
   };
 
-  return merchants.length > 0 ? (
-    <div className={styles.navHolder}>
-      <div className={styles.title}>My Account</div>
-      <ul className={styles.navList}>
-        {user?.name ? (
-          <Link href={`/user-settings`}>
-            {' '}
-            <li>{user.name}</li>
-          </Link>
+  return (
+    <>
+      <div className={styles.navHolder}>
+        <SideNavUser />
+        <div className={styles.title}>Popular:</div>
+        {merchants.length > 0 ? (
+          <ul className={styles.navList}>
+            {categories.slice(0, 6).map((category, index) => (
+              <Link
+                onClick={() => handleVoucherTypeClick('category', category)}
+                href={`/select-deal?recipientCountryCode=ZA&category=${category}`}
+                key={index}
+              >
+                <li>{category}</li>
+              </Link>
+            ))}
+            <Link href={`/?recipientCountryCode=ZA`}>
+              <li>All categories +</li>
+            </Link>
+          </ul>
         ) : (
-          <Link href={`/login`}>
-            <li>Login</li>
-          </Link>
+          <></>
         )}
-
-        {/* <li>
-          <Link href={`/voucher-history`}>Voucher History</Link>
-        </li> */}
-      </ul>
-      <div className={styles.title}>Recipients:</div>
-      <ul className={styles.navList}>
-        {user?.name && (
-          <Link href={`/my-recipients`}>
-            {/* <Link href={`/select-recipient`}> */}
-            <li>My Recipients</li>
-          </Link>
-        )}
-        <Link href={`/create-recipient`}>
-          <li>Create Recipient</li>
-        </Link>
-      </ul>
-      <div className={styles.title}>Popular:</div>
-      <ul className={styles.navList}>
-        {categories.slice(0, 6).map((category, index) => (
-          <Link
-            onClick={() => handleVoucherTypeClick('category', category)}
-            href={`/select-deal?recipientCountryCode=ZA&category=${category}`}
-            key={index}
-          >
-            <li>{category}</li>
-          </Link>
-        ))}
-        <Link href={`/?recipientCountryCode=ZA`}>
-          <li>All categories +</li>
-        </Link>
-      </ul>
-      {/* <div className={styles.title}>Popular Partners:</div>
+        {/* <div className={styles.title}>Popular Partners:</div>
       <ul className={styles.navList}>
         {merchantList.slice(0, 10).map((merchant, index) => (
           <Link
@@ -127,9 +102,8 @@ function SideNav() {
           <li>All Merchants + </li>
         </Link>
       </ul> */}
-    </div>
-  ) : (
-    <div className={styles.navHolder} />
+      </div>
+    </>
   );
 }
 

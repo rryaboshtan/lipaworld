@@ -4,7 +4,7 @@ import Img from 'next/image';
 import { useMerchants } from '@/context';
 import Cart from '@/components/cart/Cart';
 import styles from './NavMobile.module.scss';
-import { getUser } from '@/services/AuthService';
+import { useUser } from '@/context';
 import Logo from '@components/logo/Logo';
 
 interface NavProps {
@@ -20,7 +20,7 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
   const [categories, setCategories] = useState<string[]>([]);
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
 
-  const user = getUser();
+  const user = useUser();
 
   useEffect(() => {
     if (merchants.length === 0) return;
@@ -46,7 +46,7 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
 
   useEffect(() => {
     if (isAuthed === null) {
-      user !== 'undefined' && user ? setIsAuthed(true) : setIsAuthed(false);
+      user ? setIsAuthed(true) : setIsAuthed(false);
     }
   }, [isAuthed, user]);
 

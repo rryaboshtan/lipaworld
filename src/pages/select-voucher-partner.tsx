@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import { useMerchants } from '@/context';
 import { IMerchant } from '@/types';
 import lookup from 'country-code-lookup';

@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction } from 'react';
 import { TextField } from '@mui/material';
 import { IVoucher } from '@/types';
 import RedemptionQuantity from '@components/redemptionQuantity/RedemptionQuantity';
-import { getUser } from '@services/AuthService';
+import { useUser } from '@/context';
 
 interface IRedemptionInput {
   voucher: IVoucher;
@@ -19,7 +19,7 @@ const RedemptionInput = ({
   setQuantity,
   quantity,
 }: IRedemptionInput) => {
-  const user = getUser();
+  const user = useUser();
 
   return user ? (
     <div>

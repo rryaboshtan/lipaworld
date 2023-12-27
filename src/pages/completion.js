@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import mobileDetect from 'mobile-detect';
 import { useTransaction, useDispatchTransaction } from '@/context';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import Nav from '../components/nav/Nav';
 import { Montserrat } from 'next/font/google';
 import NavMobile from '../components/navMobile/NavMobile';
@@ -33,9 +33,9 @@ export default function Completion() {
   const transaction = useTransaction();
   const dispatchTransaction = useDispatchTransaction;
 
-  const user = getUser();
-  const name = user !== 'undefined' && user ? user.name : '';
-  const surname = user !== 'undefined' && user ? user.surname : '';
+  const user = useUser();
+  const name = user ? user?.name : '';
+  // const surname = user ? user?.surname : '';
 
   const createVoucherUrl = `${process.env.NEXT_PUBLIC_API_VOUCHERS_URL}`;
 
