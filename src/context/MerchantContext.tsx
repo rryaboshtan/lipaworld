@@ -110,6 +110,7 @@ const mappedMerchants = parsedProducts
       categories: [product.category],
       merchantName: product.merchant_name,
       countryCode: 'ZA',
+      redemptionCountryCode: 'ZA',
       status: ERetailStatus.Active,
     };
   });

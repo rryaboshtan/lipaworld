@@ -24,6 +24,7 @@
       "@services/*": ["./src/services/*"],
       "@data/*": ["./src/data/*"],
       "@styles/*": ["./src/styles/*"],
+      "@constants/*": ["./src/constants/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/completion.js"],
