@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "test:e2e": "playwright test",
     "test:ci": "jest --ci",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
@@ -17,7 +18,8 @@
     "e2e": "start-server-and-test dev http://localhost:3000 \"cypress open --e2e\"",
     "e2e:headless": "start-server-and-test dev http://localhost:3000 \"cypress run --e2e\"",
     "component": "cypress open --component",
-    "component:headless": "cypress run --component"
+    "component:headless": "cypress run --component",
+    "playwright:deps": "npx playwright install --with-deps"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -51,6 +53,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.40.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/react-hooks": "^8.0.1",

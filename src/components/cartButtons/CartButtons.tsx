@@ -1,6 +1,6 @@
 import React, { Dispatch } from 'react';
 import { useRouter } from 'next/router';
-import { getUser } from '@/services/AuthService';
+import { useUser } from '@/context';
 import { useDispatchCart } from '@/context';
 import { IVoucher, IRecipient } from '@/types';
 import styles from './CartButtons.module.scss';
@@ -24,7 +24,7 @@ function CartButtons({
   setProductRecipient,
 }: ICartButtonsProps) {
   const dispatchCart = useDispatchCart();
-  const user = getUser();
+  const user = useUser();
   const router = useRouter();
 
   const readyForCart = user?.name && productRecipient;

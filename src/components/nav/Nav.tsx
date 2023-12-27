@@ -3,16 +3,16 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import {
-  getUser,
   getToken,
   setUserSession,
   resetUserSession,
 } from '@services/AuthService';
-import { useDispatchCart, useDispatchTransaction } from '@/context';
+import { useDispatchCart, useDispatchTransaction, useUser } from '@/context';
 import styles from './Nav.module.scss';
 
 function Nav() {
   const dispatchCart = useDispatchCart();
+  const user = useUser();
   const dispatchTransaction = useDispatchTransaction();
 
   const [isAuthenticating, setIsAuthenticating] = useState(true);
@@ -40,7 +40,7 @@ function Nav() {
       };
 
       const requestBody = {
-        user: getUser(),
+        user,
         token,
       };
 
@@ -59,7 +59,7 @@ function Nav() {
           resetUserSession();
         });
     }
-  }, [isAuthed]);
+  }, [isAuthed, user]);
 
   useEffect(() => {
     const sessionCartId: string | null = sessionStorage.getItem('cartId');

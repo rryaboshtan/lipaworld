@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import { useRecipients, useCart } from '@/context';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import Nav from '../components/nav/Nav';
 import NavMobile from '../components/navMobile/NavMobile';
 
@@ -17,12 +17,12 @@ dotenv.config();
 export default function SendVoucher() {
   const cart = useCart();
   const recipients = useRecipients();
-  const user = getUser();
+  const user = useUser();
 
   const [transaction, setStoredTransaction] = useState<any>({});
 
   const router = useRouter();
-  const name = user !== 'undefined' && user ? user.name : '';
+  const name = user ? user.name : '';
 
   const createVoucherUrl = `${process.env.NEXT_PUBLIC_API_VOUCHERS_URL}`;
 

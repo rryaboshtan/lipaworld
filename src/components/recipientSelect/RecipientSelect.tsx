@@ -5,7 +5,7 @@ import { useRecipients, useDispatchRecipients } from '@/context';
 
 import styles from './RecipientSelect.module.scss';
 import { IRecipient } from '@/types';
-import { getUser } from '@services/AuthService';
+import { useUser } from '@/context';
 
 interface Props {
   setProductRecipient: Dispatch<IRecipient>;
@@ -16,7 +16,7 @@ const RecipientSelect: React.FC<Props> = ({
   setProductRecipient,
   productRecipient,
 }) => {
-  const user = getUser();
+  const user = useUser();
   const recipients = useRecipients();
   const dispatchRecipients = useDispatchRecipients();
 

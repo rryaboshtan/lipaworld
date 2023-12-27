@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { getUser } from '../services/AuthService';
+import { useUser } from '@/context';
 import { IRecipient } from '@/types';
 import { useDispatchRecipients } from '@/context';
 import { TextField } from '@mui/material';
@@ -20,9 +20,8 @@ const montserrat = Montserrat({ subsets: ['latin'] });
 export default function CreateRecipient() {
   const dispatchRecipients = useDispatchRecipients();
   const router = useRouter();
-  const user = getUser();
-  const senderId =
-    user !== 'undefined' && user !== null && user ? user.id : null;
+  const user = useUser();
+  const senderId = user?.id ?? null;
 
   const [message, setMessage] = useState<string | null>(null);
   const [mobileNumber, setMobileNumber] = useState<string>('');

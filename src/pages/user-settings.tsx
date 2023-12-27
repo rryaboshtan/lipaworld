@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { getUser, resetUserSession } from '../services/AuthService';
+import { resetUserSession } from '../services/AuthService';
+import { useUser, useDispatchUser } from '@/context';
 import { useRouter } from 'next/router';
 import SideNav from '../components/sideNav/SideNav';
 import { Montserrat } from 'next/font/google';
@@ -11,13 +11,17 @@ import styles from '../styles/page.module.css';
 
 export default function UserSettings() {
   const router = useRouter();
-  const user = getUser();
-  const name = user !== 'undefined' && user ? user.name : '';
+  const user = useUser();
+  const dispatchUser = useDispatchUser();
   // const [message, setMessage] = useState<null | string>(null);
 
-  user === undefined && router.push('/login');
+  if (user === null) {
+    router.push('/login');
+  }
 
   const logoutHandler = () => {
+    dispatchUser({ type: 'SET_USER', payload: null });
+
     resetUserSession();
     router.push('/select-deal?recipientCountryCode=ZA&category=Airtime');
   };
@@ -65,7 +69,7 @@ export default function UserSettings() {
             <div className={styles.pageHeading}>Settings</div>
             <br />
             <br />
-            Name: {name}
+            Name: {user?.name}
             <br />
             <br />
             Email: {user?.email}

@@ -6,7 +6,6 @@ import {
   Dispatch,
 } from 'react';
 
-// Define the interface for the user data
 interface IUser {
   id?: string;
   name: string;
@@ -14,6 +13,7 @@ interface IUser {
   city: string;
   country: string;
   mobileNumber: string;
+  email?: string;
 }
 
 // Define the type for the user state
@@ -31,10 +31,6 @@ type UserAction =
     }
   | {
       type: 'DELETE_USER';
-    }
-  | {
-      type: 'ADD_USER';
-      payload: IUser; // The new user data
     };
 
 // Create the user state context with a null value as initial value
@@ -48,20 +44,15 @@ const reducer = (state: UserState, action: UserAction) => {
   switch (action.type) {
     case 'SET_USER':
       // Return the new user data as the state
+      console.log('SET_USER', action.payload);
       return action.payload;
     case 'UPDATE_USER':
       // Return the updated user data as the state
       return action.payload;
     case 'DELETE_USER':
       // TODO: Add some logic to delete the user from a database or an API
-
       // Return null as the state
       return null;
-    case 'ADD_USER':
-      // Generate a random id for the new user
-      action.payload.id = Math.random().toString(36).substr(2, 9);
-      // Return the new user data as the state
-      return action.payload;
     default:
       throw new Error(`Unknown action: ${JSON.stringify(action)}`);
   }
