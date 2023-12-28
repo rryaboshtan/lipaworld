@@ -20,6 +20,7 @@ const SideNavCategories = () => {
     const topCategories = [
       'Shopping',
       'Airtime',
+      'Bundle',
       'Data',
       'Fuel',
       'Healthcare',

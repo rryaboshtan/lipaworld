@@ -118,13 +118,15 @@ export default function SelectDeal() {
             <SideNav />
 
             <div className={styles.dealHolder}>
-              <div
-                className={styles.errorMessage}
-                style={{ margin: '0 0 1rem 1rem' }}
-              >
-                <p>{errorMessage}</p>
-                <br />
-              </div>
+              {errorMessage && (
+                <div
+                  className={styles.errorMessage}
+                  style={{ margin: '0 0 1rem 1rem' }}
+                >
+                  <p>{errorMessage}</p>
+                  <br />
+                </div>
+              )}
               {headingPlaceholder && (
                 <div
                   className={styles.pageHeading}
