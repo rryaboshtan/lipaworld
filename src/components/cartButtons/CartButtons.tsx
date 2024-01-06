@@ -1,5 +1,6 @@
 import React, { Dispatch } from 'react';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 import { useUser } from '@/context';
 import { useDispatchCart } from '@/context';
 import { IVoucher, IRecipient } from '@/types';
@@ -30,6 +31,13 @@ function CartButtons({
   const readyForCart = user?.name && productRecipient;
 
   const addtoCartHandler = (deal: IVoucher, amount: number) => {
+    if (!readyForCart) {
+      toast.warn('Create recipient before adding to cart.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+      return;
+    }
+
     console.log('ADD TO CART', { ...deal, quantity: quantity });
 
     try {
@@ -71,7 +79,7 @@ function CartButtons({
       <button
         className={styles.cart}
         onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
-        disabled={!readyForCart}
+        // disabled={!readyForCart}
       >
         Add to Cart
       </button>
