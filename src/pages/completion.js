@@ -261,7 +261,7 @@ export default function Completion() {
     window.open(whatsAppShareBlock, '_blank');
   };
 
-  const sendPinSmsMessage = () => {
+  const sendPinSmsMessage = (item) => {
     mixpanel.track(`Sent SMS to a recipient with voucher`);
 
     const description = document.createElement('div');
@@ -322,7 +322,7 @@ export default function Completion() {
     window.open(whatsAppShareBlockTopUp, '_blank');
   };
 
-  const sendTopUpSmsMessage = () => {
+  const sendTopUpSmsMessage = (item) => {
     mixpanel.track(`Sent SMS to a recipient with voucher`);
 
     const description = document.createElement('div');
