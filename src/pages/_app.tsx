@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
+import { ToastContainer } from 'react-toastify';
 import mixpanel from 'mixpanel-browser';
 import {
   CartProvider,
@@ -16,6 +17,7 @@ import {
 import '@/styles/globals.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import 'react-toastify/dist/ReactToastify.css';
 import Script from 'next/script';
 
 dotenv.config();
@@ -89,6 +91,7 @@ export default function App({ Component, pageProps }: AppProps) {
         src={process.env.NEXT_PUBLIC_HUBSPOT_CHAT}
       />
       {/*End of HubSpot Embed Code */}
+      <ToastContainer />
     </>
   );
 }
