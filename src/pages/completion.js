@@ -183,8 +183,8 @@ export default function Completion() {
         sender: user,
       };
 
-      // const url = `${createVoucherUrl}/extractvouchers`;
-      const url = `http://localhost:5019/extractvouchers`;
+      const url = `${createVoucherUrl}/extractvouchers`;
+      // const url = `http://localhost:5019/extractvouchers`;
       axios.post(url, requestBody, requestConfig).then((response) => {
         console.log('response from vouchers api', response.data);
         setVouchers(response.data.cart.cartItems);
