@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 import {
   FormControl,
   InputLabel,
@@ -96,64 +97,79 @@ export default function Register(): JSX.Element {
       hackyRegex.test(country);
 
     if (hackyDetail) {
-      setMessage('Malicious characters found in one or more fields.');
+      toast.warn('Malicious characters found in one or more fields.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (missingDetail) {
-      setMessage('Please fill in all required fields.');
+      toast.warn('Please fill in all required fields.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (!agreedWithTerms) {
-      setMessage('Please accept our Terms & Conditions and Privacy Policy.');
+      toast.warn('Please accept our Terms & Conditions and Privacy Policy.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     const alphaNames = nameRegex.test(name) && nameRegex.test(surname);
 
     if (!alphaNames) {
-      console.log('hackyDetail', hackyDetail);
-      console.log('hackyDetail-name', hackyRegex.test(name));
-      console.log('hackyDetail-surname', hackyRegex.test(surname));
-      console.log('alphaNames', alphaNames);
-      console.log('alphaNames-name', nameRegex.test(name));
-      console.log('alphaNames-surname', nameRegex.test(surname));
-      setMessage('Invalid characters found in first or last name.');
+      toast.warn('Invalid characters found in first or last name.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match.');
+      toast.warn('Passwords do not match.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     const dateOfBirth = `${dateOfBirthDD}/${dateOfBirthMM}/${dateOfBirthYYYY}`;
 
     if (new Date(dateOfBirth) > new Date()) {
-      setMessage('Date of birth is invalid.');
+      toast.warn('Date of birth is invalid.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (!dateOfBirthDD || !dateOfBirthMM || !dateOfBirthYYYY) {
-      setMessage('Date of Birth is required');
+      toast.warn('Date of Birth is required.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (dateOfBirthDD < 1 || dateOfBirthDD > 31) {
-      setMessage('Day must be between 1 and 31');
+      toast.warn('Day must be between 1 and 31.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (dateOfBirthMM < 1 || dateOfBirthMM > 12) {
-      setMessage('Month must be between 1 and 12');
+      toast.warn('Month must be between 1 and 12.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     const currentYear = new Date().getFullYear();
     if (dateOfBirthYYYY < 1900 || dateOfBirthYYYY > currentYear - 18) {
-      setMessage(
-        `Year must be between 1900 and ${currentYear - 18}. At least aged 18.`
+      toast.warn(
+        `Year must be between 1900 and ${currentYear - 18}. At least aged 18.`,
+        {
+          position: toast.POSITION.BOTTOM_LEFT,
+        }
       );
       return;
     }
@@ -187,6 +203,10 @@ export default function Register(): JSX.Element {
       );
       mixpanel.track('Registration successful');
 
+      toast.success('Registration successful.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+
       router.push(
         '/login/?useremail=' +
           email +
@@ -197,9 +217,13 @@ export default function Register(): JSX.Element {
       mixpanel.track(`Registration failed with code: ${error.code}`);
 
       if (error.response?.status === 401 || error.response?.status === 403) {
-        setMessage('Invalid credentials');
+        toast.warn('Invalid credentials.', {
+          position: toast.POSITION.BOTTOM_LEFT,
+        });
       } else {
-        setMessage('Something went wrong. Please try again later');
+        toast.warn('Something went wrong. Please try again later.', {
+          position: toast.POSITION.BOTTOM_LEFT,
+        });
       }
       console.log(error);
     }
