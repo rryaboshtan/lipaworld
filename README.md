@@ -50,4 +50,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## APIs
 
-Stripe payment service - https://vpm5jb834b.execute-api.us-east-1.amazonaws.com/dev
+Stripe payment service - https://vpm5jb834b.execute-api.us-east-1.amazonaws.com/dev [removed]
+
+## URLs for media files 
+
+eg: https://deh86ggdgd1cn.cloudfront.net/public/logo.png
