@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { WaitTime } from 'aws-cdk-lib/aws-stepfunctions';
 
 test('login and logout Simba', async ({ page }) => {
   await page.goto('/');

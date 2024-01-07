@@ -18,7 +18,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
 
-import Nav from '../components/nav/Nav';
 import { Montserrat } from 'next/font/google';
 const montserrat = Montserrat({ subsets: ['latin'] });
 import PhoneForm from '../components/phoneInput/PhoneInput';
@@ -45,7 +44,7 @@ export default function Register(): JSX.Element {
   const hackyRegex =
     /<script|<\/script>|javascript:|<|>|onload=|onerror=|onmouseover=|onmouseout=|onfocus=|onblur=|onclick=|ondblclick=|onkeydown=|onkeypress=|onkeyup=|onsubmit=|onreset=|onselect=|onchange=|onloadstart=|onprogress=|onabort=|onloadend=|oncanplay=|oncanplaythrough=|ondurationchange=|onemptied=|onended=|onerror=|oninput=|oninvalid=|onpause=|onplay=|onplaying=|onprogress=|onratechange=|onreadystatechange=|onseeked=|onseeking=|onstalled=|onsuspend=|ontimeupdate=|onvolumechange=|onwaiting=/i;
 
-  const nameRegex = /^[a-zA-Z]+$/;
+  const nameRegex = /^[^<>;{}()0-9_|\n]+$/;
 
   const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -83,12 +82,12 @@ export default function Register(): JSX.Element {
       !country;
 
     const hackyDetail =
+      hackyRegex.test(name) ||
       hackyRegex.test(surname) ||
       hackyRegex.test(mobileNumber) ||
       hackyRegex.test(email) ||
       hackyRegex.test(password) ||
       hackyRegex.test(confirmPassword) ||
-      hackyRegex.test(name) ||
       hackyRegex.test(dateOfBirthDD) ||
       hackyRegex.test(dateOfBirthMM) ||
       hackyRegex.test(dateOfBirthYYYY) ||
@@ -96,7 +95,33 @@ export default function Register(): JSX.Element {
       hackyRegex.test(city) ||
       hackyRegex.test(country);
 
-    const alphaNames = !nameRegex.test(name) || !nameRegex.test(surname);
+    if (hackyDetail) {
+      setMessage('Malicious characters found in one or more fields.');
+      return;
+    }
+
+    if (missingDetail) {
+      setMessage('Please fill in all required fields.');
+      return;
+    }
+
+    if (!agreedWithTerms) {
+      setMessage('Please accept our Terms & Conditions and Privacy Policy.');
+      return;
+    }
+
+    const alphaNames = nameRegex.test(name) && nameRegex.test(surname);
+
+    if (!alphaNames) {
+      console.log('hackyDetail', hackyDetail);
+      console.log('hackyDetail-name', hackyRegex.test(name));
+      console.log('hackyDetail-surname', hackyRegex.test(surname));
+      console.log('alphaNames', alphaNames);
+      console.log('alphaNames-name', nameRegex.test(name));
+      console.log('alphaNames-surname', nameRegex.test(surname));
+      setMessage('Invalid characters found in first or last name.');
+      return;
+    }
 
     if (password !== confirmPassword) {
       setMessage('Passwords do not match.');
@@ -133,21 +158,6 @@ export default function Register(): JSX.Element {
       return;
     }
 
-    if (missingDetail) {
-      setMessage('Please fill in all required fields.');
-      return;
-    }
-
-    if (!agreedWithTerms) {
-      setMessage('Please accept our Terms & Conditions and Privacy Policy.');
-      return;
-    }
-
-    if (hackyDetail || alphaNames) {
-      setMessage('Invalid characters detected.');
-      return;
-    }
-
     const requestConfig = {
       headers: {
         'Content-Type': 'application/json',
@@ -175,10 +185,8 @@ export default function Register(): JSX.Element {
         requestBody,
         requestConfig
       );
-      setMessage('Registration successful');
       mixpanel.track('Registration successful');
 
-      // console.log(response);
       router.push(
         '/login/?useremail=' +
           email +
@@ -456,7 +464,13 @@ export default function Register(): JSX.Element {
                 />
               </div>
 
-              <div> {message && <p className='message'>{message}</p>}</div>
+              <div>
+                {message && (
+                  <p className='message' style={{ color: 'red' }}>
+                    {message}
+                  </p>
+                )}
+              </div>
               <div className={styles.contentFooter}>
                 <input
                   type='submit'
@@ -477,8 +491,6 @@ export default function Register(): JSX.Element {
           </div>
         </div>
       </div>
-
-      {/* <Nav /> */}
     </main>
   );
 }
