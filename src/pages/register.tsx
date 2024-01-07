@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 import {
   FormControl,
   InputLabel,
@@ -18,7 +19,6 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
 
-import Nav from '../components/nav/Nav';
 import { Montserrat } from 'next/font/google';
 const montserrat = Montserrat({ subsets: ['latin'] });
 import PhoneForm from '../components/phoneInput/PhoneInput';
@@ -45,7 +45,7 @@ export default function Register(): JSX.Element {
   const hackyRegex =
     /<script|<\/script>|javascript:|<|>|onload=|onerror=|onmouseover=|onmouseout=|onfocus=|onblur=|onclick=|ondblclick=|onkeydown=|onkeypress=|onkeyup=|onsubmit=|onreset=|onselect=|onchange=|onloadstart=|onprogress=|onabort=|onloadend=|oncanplay=|oncanplaythrough=|ondurationchange=|onemptied=|onended=|onerror=|oninput=|oninvalid=|onpause=|onplay=|onplaying=|onprogress=|onratechange=|onreadystatechange=|onseeked=|onseeking=|onstalled=|onsuspend=|ontimeupdate=|onvolumechange=|onwaiting=/i;
 
-  const nameRegex = /^[a-zA-Z]+$/;
+  const nameRegex = /^[^<>;{}()0-9_|\n]+$/;
 
   const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -83,12 +83,12 @@ export default function Register(): JSX.Element {
       !country;
 
     const hackyDetail =
+      hackyRegex.test(name) ||
       hackyRegex.test(surname) ||
       hackyRegex.test(mobileNumber) ||
       hackyRegex.test(email) ||
       hackyRegex.test(password) ||
       hackyRegex.test(confirmPassword) ||
-      hackyRegex.test(name) ||
       hackyRegex.test(dateOfBirthDD) ||
       hackyRegex.test(dateOfBirthMM) ||
       hackyRegex.test(dateOfBirthYYYY) ||
@@ -96,55 +96,81 @@ export default function Register(): JSX.Element {
       hackyRegex.test(city) ||
       hackyRegex.test(country);
 
-    const alphaNames = !nameRegex.test(name) || !nameRegex.test(surname);
+    if (hackyDetail) {
+      toast.warn('Malicious characters found in one or more fields.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+      return;
+    }
+
+    if (missingDetail) {
+      toast.warn('Please fill in all required fields.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+      return;
+    }
+
+    if (!agreedWithTerms) {
+      toast.warn('Please accept our Terms & Conditions and Privacy Policy.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+      return;
+    }
+
+    const alphaNames = nameRegex.test(name) && nameRegex.test(surname);
+
+    if (!alphaNames) {
+      toast.warn('Invalid characters found in first or last name.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+      return;
+    }
 
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match.');
+      toast.warn('Passwords do not match.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     const dateOfBirth = `${dateOfBirthDD}/${dateOfBirthMM}/${dateOfBirthYYYY}`;
 
     if (new Date(dateOfBirth) > new Date()) {
-      setMessage('Date of birth is invalid.');
+      toast.warn('Date of birth is invalid.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (!dateOfBirthDD || !dateOfBirthMM || !dateOfBirthYYYY) {
-      setMessage('Date of Birth is required');
+      toast.warn('Date of Birth is required.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (dateOfBirthDD < 1 || dateOfBirthDD > 31) {
-      setMessage('Day must be between 1 and 31');
+      toast.warn('Day must be between 1 and 31.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     if (dateOfBirthMM < 1 || dateOfBirthMM > 12) {
-      setMessage('Month must be between 1 and 12');
+      toast.warn('Month must be between 1 and 12.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
       return;
     }
 
     const currentYear = new Date().getFullYear();
     if (dateOfBirthYYYY < 1900 || dateOfBirthYYYY > currentYear - 18) {
-      setMessage(
-        `Year must be between 1900 and ${currentYear - 18}. At least aged 18.`
+      toast.warn(
+        `Year must be between 1900 and ${currentYear - 18}. At least aged 18.`,
+        {
+          position: toast.POSITION.BOTTOM_LEFT,
+        }
       );
-      return;
-    }
-
-    if (missingDetail) {
-      setMessage('Please fill in all required fields.');
-      return;
-    }
-
-    if (!agreedWithTerms) {
-      setMessage('Please accept our Terms & Conditions and Privacy Policy.');
-      return;
-    }
-
-    if (hackyDetail || alphaNames) {
-      setMessage('Invalid characters detected.');
       return;
     }
 
@@ -175,10 +201,12 @@ export default function Register(): JSX.Element {
         requestBody,
         requestConfig
       );
-      setMessage('Registration successful');
       mixpanel.track('Registration successful');
 
-      // console.log(response);
+      toast.success('Registration successful.', {
+        position: toast.POSITION.BOTTOM_LEFT,
+      });
+
       router.push(
         '/login/?useremail=' +
           email +
@@ -189,9 +217,13 @@ export default function Register(): JSX.Element {
       mixpanel.track(`Registration failed with code: ${error.code}`);
 
       if (error.response?.status === 401 || error.response?.status === 403) {
-        setMessage('Invalid credentials');
+        toast.warn('Invalid credentials.', {
+          position: toast.POSITION.BOTTOM_LEFT,
+        });
       } else {
-        setMessage('Something went wrong. Please try again later');
+        toast.warn('Something went wrong. Please try again later.', {
+          position: toast.POSITION.BOTTOM_LEFT,
+        });
       }
       console.log(error);
     }
@@ -456,7 +488,13 @@ export default function Register(): JSX.Element {
                 />
               </div>
 
-              <div> {message && <p className='message'>{message}</p>}</div>
+              <div>
+                {message && (
+                  <p className='message' style={{ color: 'red' }}>
+                    {message}
+                  </p>
+                )}
+              </div>
               <div className={styles.contentFooter}>
                 <input
                   type='submit'
@@ -477,8 +515,6 @@ export default function Register(): JSX.Element {
           </div>
         </div>
       </div>
-
-      {/* <Nav /> */}
     </main>
   );
 }
