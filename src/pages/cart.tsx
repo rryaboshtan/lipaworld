@@ -360,7 +360,7 @@ export default function CartContainer() {
         )}
       </div>
 
-      {/* <Nav /> */}
+      <Nav />
     </main>
   );
 }

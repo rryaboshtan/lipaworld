@@ -5,7 +5,6 @@ import axios from 'axios';
 import mobileDetect from 'mobile-detect';
 import { useTransaction, useDispatchTransaction } from '@/context';
 import { useUser } from '@/context';
-import Nav from '../components/nav/Nav';
 import { Montserrat } from 'next/font/google';
 import NavMobile from '../components/navMobile/NavMobile';
 
@@ -63,7 +62,7 @@ export default function Completion() {
     if (vouchers && vouchers.length > 0) {
       setVoucherMessageBody(
         <>
-          Purchased vouchers are now ready:
+          Process complete.
           <br />
           <br />
           {vouchers.map((item) => {
@@ -197,7 +196,7 @@ export default function Completion() {
       });
     } catch (error) {
       console.log('error', error);
-      setVoucherMessageBody(<>Something went wrong: {error.message}</>);
+      setVoucherMessageBody(<>Something went wrong: {error?.message}</>);
     }
   };
 
@@ -254,9 +253,9 @@ export default function Completion() {
       item.redemptionUnitValue / 100
     ).toFixed(2)} *${item.deal.voucherName}* from ${
       item.deal.merchantName
-    }.{' '}\n\nDetails:\n\n${cartItems.join(
-      '\n\n'
-    )}{' '}${description}\n\n ${termsAndConditions}. Terms & Conditions: on www.lipaworld.com`;
+    }.\n\nDetails:\n\n${cartItems.join('\n\n')}${
+      item.deal.voucherDescription
+    }\n\n ${item.deal.terms}. Terms & Conditions: on www.lipaworld.com`;
     const whatsAppShareBlock = `https://api.whatsapp.com/send/?text=${message}&type=custom_url&app_absent=0`;
     window.open(whatsAppShareBlock, '_blank');
   };
@@ -284,9 +283,9 @@ export default function Completion() {
       item.redemptionUnitValue / 100
     ).toFixed(2)} *${item.deal.voucherName}* from ${
       item.deal.merchantName
-    }.{' '}\n\nDetails below:\n\n${cartItems.join(
-      '\n\n'
-    )}${description}\n\n ${termsAndConditions} Terms & Conditions: on www.lipaworld.com`;
+    }.\n\nDetails below:\n\n${cartItems.join('\n\n')}${
+      item.deal.voucherDescription
+    }\n\n ${item.deal.terms} Terms & Conditions: on www.lipaworld.com`;
 
     const smsShareBlock = `sms:${
       item.productRecipient.mobileNumber
@@ -311,7 +310,7 @@ export default function Completion() {
       item.redemptionUnitValue / 100
     ).toFixed(2)} *${item.deal.voucherName}* from ${
       item.deal.merchantName
-    }.{' '}\n\nDescription below:\n\n${
+    }.\n\nDescription below:\n\n${
       item.deal.voucherDescription
     }\n\n Terms below:\n\n${
       item.deal.terms
@@ -340,7 +339,9 @@ export default function Completion() {
       item.redemptionUnitValue / 100
     ).toFixed(2)} *${item.deal.voucherName}* from ${
       item.deal.merchantName
-    }\n\nDetails below:\n\n${description}\n\n ${termsAndConditions} Terms & Conditions: on www.lipaworld.com`;
+    }\n\nDetails below:\n\n${item.deal.voucherDescription}\n\n ${
+      item.deal.terms
+    } Terms & Conditions: on www.lipaworld.com`;
 
     const smsShareBlock = `sms:${
       item.productRecipient.mobileNumber
@@ -395,15 +396,13 @@ export default function Completion() {
             <input
               type='button'
               className={styles.actionButton}
-              value='Buy more Vouchers'
+              value='Browse vouchers'
               onClick={getMoreVouchers}
             />
           </>
         )}
         <p></p>
       </div>
-
-      <Nav />
     </main>
   );
 }

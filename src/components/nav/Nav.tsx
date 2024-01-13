@@ -151,14 +151,14 @@ function Nav() {
   }, []);
 
   return (
-    <div className={styles.grid} id='nav'>
+    <>
       {/* <Link href='/' className={styles.card}>
         <h2>
           Home <span>-&gt;</span>
         </h2>
         <p>See overview</p>
       </Link> */}
-      {!isAuthed && !isAuthenticating && (
+      {/* {!isAuthed && !isAuthenticating && (
         <>
           <Link href='/register' className={styles.card}>
             <h2>
@@ -173,9 +173,9 @@ function Nav() {
             <p>Jump to login page</p>
           </Link>
         </>
-      )}
+      )} */}
 
-      {isAuthed && !isAuthenticating && (
+      {/* {isAuthed && !isAuthenticating && (
         <>
           <Link href='/user-settings' className={styles.card}>
             <h2>
@@ -184,8 +184,8 @@ function Nav() {
             <p> User Settings</p>
           </Link>
         </>
-      )}
-    </div>
+      )} */}
+    </>
   );
 }
 

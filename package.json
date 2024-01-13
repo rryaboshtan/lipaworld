@@ -1,6 +1,6 @@
 {
   "name": "lipa-user-flow",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "scripts": {
     "dev": "sst bind next dev",
