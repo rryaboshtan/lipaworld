@@ -22,6 +22,8 @@ const config = {
     '/.sst',
     '/.swc',
     '/.open-next',
+    '/e2e',
+    '/e2e-results',
   ],
   coverageThreshold: {
     global: {
