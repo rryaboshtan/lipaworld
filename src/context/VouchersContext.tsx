@@ -4,6 +4,7 @@ import {
   createContext,
   ReactNode,
   Dispatch,
+  useEffect,
 } from 'react';
 import { IVoucher } from '@/types';
 import products from '@/data/denomination_lipaworld.json';
@@ -101,7 +102,7 @@ const activeProducts = parsedProducts.filter(
   (product: any) => product.status === 'Active'
 );
 
-const mappedProducts = activeProducts.map((product: any) => ({
+const mappedProducts: IVoucher[] = activeProducts.map((product: any) => ({
   merchantId: product.merchant_id,
   categories: [product.category],
   merchantName: product.merchant_name,
@@ -133,7 +134,30 @@ const mappedProducts = activeProducts.map((product: any) => ({
 // Create a custom provider component that wraps the children with the vouchers context
 export const VouchersProvider = ({ children }: VouchersProviderProps) => {
   // Use reducer to manage the vouchers state and dispatch actions
-  const [state, dispatch] = useReducer(reducer, mappedProducts);
+  const [state, dispatch] = useReducer(reducer, []);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_VOUCHERS_URL}/inventory`)
+      .then((response) => response.json())
+      .then((availableInventory) => {
+        const updatedProducts = mappedProducts.map((product) => {
+          // Check if the partnerName is 'Stellr' or 'Payment24' and the dealId is not in the availableInventory
+          if (
+            (product.partnerName === 'Stellr' ||
+              product.partnerName === 'Payment 24') &&
+            !availableInventory.includes(product.dealId)
+          ) {
+            // Change the status to 'OutOfStock'
+            return { ...product, status: 'OutOfStock' };
+          }
+          // Return the product without changes
+          return product;
+        });
+
+        dispatch({ type: 'SET_VOUCHERS', payload: updatedProducts });
+      });
+  }, []);
+
   return (
     <VouchersDispatchContext.Provider value={dispatch}>
       <VouchersStateContext.Provider value={state}>

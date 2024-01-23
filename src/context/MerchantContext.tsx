@@ -4,6 +4,7 @@ import {
   createContext,
   ReactNode,
   Dispatch,
+  useEffect,
 } from 'react';
 import { IMerchant, ERetailStatus } from '@/types';
 import products from '@/data/denomination_lipaworld.json';
@@ -112,13 +113,38 @@ const mappedMerchants = parsedProducts
       countryCode: 'ZA',
       redemptionCountryCode: 'ZA',
       status: ERetailStatus.Active,
+      dealId: product.product_id,
+      partnerName: product.channel_partner,
     };
   });
 
 // Create a custom provider component that wraps the children with the merchants context
 export const MerchantsProvider = ({ children }: MerchantsProviderProps) => {
   // Use reducer to manage the merchants state and dispatch actions
-  const [state, dispatch] = useReducer(reducer, mappedMerchants);
+  const [state, dispatch] = useReducer(reducer, []);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_VOUCHERS_URL}/inventory`)
+      .then((response) => response.json())
+      .then((availableInventory) => {
+        const updatedMerchants = mappedMerchants.map((product: any) => {
+          // Check if the partnerName is 'Stellr' or 'Payment24' and the dealId is not in the availableInventory
+          if (
+            (product.partnerName === 'Stellr' ||
+              product.partnerName === 'Payment 24') &&
+            !availableInventory.includes(product.dealId)
+          ) {
+            // Change the status to 'OutOfStock'
+            return { ...product, status: 'OutOfStock' };
+          }
+          // Return the product without changes
+          return product;
+        });
+
+        dispatch({ type: 'SET_MERCHANTS', payload: updatedMerchants });
+      });
+  }, []);
+
   return (
     <MerchantsDispatchContext.Provider value={dispatch}>
       <MerchantsStateContext.Provider value={state}>

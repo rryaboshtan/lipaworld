@@ -12,6 +12,7 @@ export enum ERedemptionStatus {
 
 export interface IVoucher {
   categories: string[];
+  countryCode: string;
   createdBy: string;
   createdOn: Date;
   expiresOn: Date;

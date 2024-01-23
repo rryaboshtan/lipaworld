@@ -47,7 +47,6 @@ export default function SelectDeal() {
 
       const matchingVouchers = vouchers.filter(
         (voucher) =>
-          voucher.status === 'Active' &&
           voucher?.redemptionCountryCode === recipientCountryCode &&
           voucher.merchantId === merchantId
       );
@@ -60,7 +59,6 @@ export default function SelectDeal() {
         );
         const list = vouchers.filter(
           (voucher) =>
-            voucher.status === 'Active' &&
             voucher.redemptionCountryCode === recipientCountryCode &&
             voucher.merchantName === 'MTN'
         );
@@ -85,7 +83,6 @@ export default function SelectDeal() {
 
       const matchingVouchers = vouchers.filter(
         (voucher) =>
-          voucher.status === 'Active' &&
           voucher?.redemptionCountryCode === recipientCountryCode &&
           voucher.categories.includes(category as string)
       );
@@ -96,7 +93,6 @@ export default function SelectDeal() {
         setErrorMessage(`No matching vouchers found for "${category}".`);
         const list = vouchers.filter(
           (voucher) =>
-            voucher.status === 'Active' &&
             voucher.redemptionCountryCode === recipientCountryCode &&
             voucher.categories.includes('Shopping')
         );

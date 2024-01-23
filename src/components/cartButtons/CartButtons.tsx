@@ -76,13 +76,19 @@ function CartButtons({
           Resend
         </button>
       )}
-      <button
-        className={styles.cart}
-        onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
-        // disabled={!readyForCart}
-      >
-        Add to Cart
-      </button>
+      {deal.status === 'OutOfStock' ? (
+        <button className={styles.cart} disabled>
+          Out of stock
+        </button>
+      ) : (
+        <button
+          className={styles.cart}
+          onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
+          // disabled={!readyForCart}
+        >
+          Add to Cart
+        </button>
+      )}
     </div>
   );
 }

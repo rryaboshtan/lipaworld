@@ -19,6 +19,12 @@
 .cart:disabled {
   color: #ffffff;
   background-color: lightslategrey;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 4px;
+  height: 36px;
+  cursor: pointer;
+  min-width: 100px;
 }
 
 .cartAdded {
