@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import { ToastContainer } from 'react-toastify';
 import mixpanel from 'mixpanel-browser';
+import Hotjar from '@hotjar/browser';
 import {
   CartProvider,
   CountriesProvider,
@@ -35,6 +36,10 @@ export default function App({ Component, pageProps }: AppProps) {
   mixpanel.track('App Mounted', {
     'Event Type': 'Test implementation',
   });
+
+  const siteId = 3834057;
+  const hotjarVersion = 6;
+  Hotjar.init(siteId, hotjarVersion);
 
   const initialOptions = {
     'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,

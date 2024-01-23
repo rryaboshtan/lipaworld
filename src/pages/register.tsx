@@ -47,13 +47,36 @@ export default function Register(): JSX.Element {
 
   const nameRegex = /^[^<>;{}()0-9_|\n]+$/;
 
+  const allowedEmails: string[] = [
+    'abk2190@columbia.edu',
+    'asanda_magawu@yahoo.com',
+    'babukatanga@gmail.com',
+    'callie.bells@live.com',
+    'edudejager@gmail.com',
+    'hermano.juvane@musari-us.com',
+    'jamesmogale@gmail.com',
+    'johnny@cheznous-rdc.com',
+    'jonathan@lipaworld.com',
+    'jorneschamp@gmail.com',
+    'lauren.c.murphy@gmail.com',
+    'ilze@ubuntutravel.us',
+    'ilzeg@me.com',
+    'makhotsor@gmail.com',
+    'merel.vanderlei@wyzetalk.com',
+    'ntlakulasesing@gmail.com',
+    'avumile@wharton.upenn.edu',
+'nikita1lledo@gmail.com',
+'mihuvhom@gmail.com',
+'simryn.dejager@cba.com.au'
+  ];
+
   const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setMessage(null);
 
     mixpanel.track('Register');
 
-    const email = event.currentTarget.email.value.trim();
+    const email: string = event.currentTarget.email.value.trim().toLowerCase();
     const password = event.currentTarget.password.value.trim();
     const confirmPassword = event.currentTarget.confirmPassword.value.trim();
     const name = event.currentTarget.fname.value.trim();
@@ -62,10 +85,20 @@ export default function Register(): JSX.Element {
     const dateOfBirthMM = event.currentTarget.dateOfBirthMM.value.trim();
     const dateOfBirthYYYY = event.currentTarget.dateOfBirthYYYY.value.trim();
     const postCode = event.currentTarget.postCode.value.trim();
-    const city = event.currentTarget.city.value.trim();
+    const city: string = event.currentTarget.city.value.trim();
     const gender = event.currentTarget.gender.value.trim();
 
     mixpanel.identify(email);
+
+    if (!allowedEmails.includes(email)) {
+      toast.warn(
+        'Lipaworld sign-ups are currently allowed for select users only. Please try again later.',
+        {
+          position: toast.POSITION.BOTTOM_LEFT,
+        }
+      );
+      return;
+    }
 
     const missingDetail =
       !name ||
