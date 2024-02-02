@@ -30,7 +30,7 @@ export default function Completion() {
   }
 
   const transaction = useTransaction();
-  const dispatchTransaction = useDispatchTransaction;
+  // const dispatchTransaction = useDispatchTransaction;
 
   const user = useUser();
   const name = user ? user?.name : '';
@@ -122,14 +122,18 @@ export default function Completion() {
                 {item.quantity} x {item.deal.redemptionCurrency}{' '}
                 {(item.redemptionUnitValue / 100).toFixed(2)}{' '}
                 {item.deal.voucherName} was topped-up to{' '}
-                {item.productRecipient.mobileNumber}
-                <br />
+                <strong>{item.productRecipient.mobileNumber}</strong>
+                <br /> <br />
                 {item.deal.voucherDescription && (
-                  <small>Description: {item.deal.voucherDescription}</small>
+                  <small>
+                    <strong>Description:</strong> {item.deal.voucherDescription}
+                  </small>
                 )}
                 <br />
                 {item.deal.terms && (
-                  <small>Terms &amp; Conditions: {item.deal.terms}</small>
+                  <small>
+                    <strong>Terms &amp; Conditions:</strong> {item.deal.terms}
+                  </small>
                 )}
                 <br />
                 <br />

@@ -9,6 +9,8 @@ export interface ICartItem {
   cartItemId: string;
   recipientId?: string;
   productRecipient: IRecipient | null | undefined;
+  error?: string;
+  vouchers?: { pin: string };
 }
 
 export interface ICart {
