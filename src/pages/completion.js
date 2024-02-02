@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import mobileDetect from 'mobile-detect';
-import { useTransaction, useDispatchTransaction } from '@/context';
+import { useTransaction, useDispatchCart } from '@/context';
 import { useUser } from '@/context';
 import { Montserrat } from 'next/font/google';
 import NavMobile from '../components/navMobile/NavMobile';
@@ -31,6 +31,7 @@ export default function Completion() {
 
   const transaction = useTransaction();
   // const dispatchTransaction = useDispatchTransaction;
+  const dispatchCart = useDispatchCart();
 
   const user = useUser();
   const name = user ? user?.name : '';
@@ -47,6 +48,7 @@ export default function Completion() {
   const [isMobile, setIsMobile] = useState(null);
 
   const getMoreVouchers = () => {
+    emptyCart();
     sessionStorage.removeItem('cart');
     router.push('/select-deal?recipientCountryCode=ZA&category=Shopping');
   };
@@ -201,6 +203,29 @@ export default function Completion() {
     } catch (error) {
       console.log('error', error);
       setVoucherMessageBody(<>Something went wrong: {error?.message}</>);
+    }
+  };
+
+  const removeFromCartHandler = (cartItemId) => {
+    try {
+      if (cartItemId) {
+        dispatchCart({
+          type: 'REMOVE_CART_ITEM',
+          payload: cartItemId,
+        });
+      } else {
+        console.log('ERROR');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const emptyCart = () => {
+    if (cart && cart.cartItems.length > 0) {
+      cart.cartItems.map((item) => {
+        removeFromCartHandler(item.cartItemId);
+      });
     }
   };
 

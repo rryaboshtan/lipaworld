@@ -11,6 +11,7 @@ export interface ICartItem {
   productRecipient: IRecipient | null | undefined;
   error?: string;
   vouchers?: { pin: string };
+  topups?: any;
 }
 
 export interface ICart {
