@@ -6,9 +6,10 @@ import { useDispatchRecipients } from '@/context';
 import { TextField } from '@mui/material';
 import mixpanel from 'mixpanel-browser';
 import { v4 as uuidv4 } from 'uuid';
+import CircularProgress from '@mui/material/CircularProgress';
+import { toast } from 'react-toastify';
 
 import SideNav from '../components/sideNav/SideNav';
-import Nav from '../components/nav/Nav';
 import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
 import PhoneForm from '../components/phoneInput/PhoneInput';
@@ -23,6 +24,7 @@ export default function CreateRecipient() {
   const user = useUser();
   const senderId = user?.id ?? null;
 
+  const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [mobileNumber, setMobileNumber] = useState<string>('');
   const [countryCode, setCountryCode] = useState<string>('');
@@ -43,6 +45,7 @@ export default function CreateRecipient() {
 
   const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
     setMessage(null);
 
     const fname = event.currentTarget.fname.value.trim();
@@ -59,35 +62,49 @@ export default function CreateRecipient() {
       hackyRegex.test(mobileNumber)
     ) {
       setMessage('Invalid characters detected.');
+      setIsLoading(false);
+
       return;
     }
 
     if (!nameRegex.test(fname)) {
       setMessage('First name must only contain alphabetic characters');
+      setIsLoading(false);
+
       return;
     }
 
     if (!nameRegex.test(surname)) {
       setMessage('Last name must only contain alphabetic characters');
+      setIsLoading(false);
+
       return;
     }
 
     if (fname === '' || surname === '' || mobileNumber === '') {
       setMessage('Name, surname and mobile number are required.');
+      setIsLoading(false);
+
       return;
     }
     if (fname.length < 3 || fname.length > 50) {
       setMessage('First name is too short.');
+      setIsLoading(false);
+
       return;
     }
 
     if (surname.length < 3 || surname.length > 50) {
       setMessage('Last name is too short.');
+      setIsLoading(false);
+
       return;
     }
 
     if (mobileNumber.length < 9 || mobileNumber.length > 20) {
       setMessage('Mobile number is not the right length.');
+      setIsLoading(false);
+
       return;
     }
 
@@ -121,6 +138,10 @@ export default function CreateRecipient() {
               payload,
             });
 
+            toast.success('Recipient created.', {
+              position: toast.POSITION.BOTTOM_LEFT,
+            });
+
             // if (searchParams?.has('return_url')) {
             //   router.push(searchParams.get('return_url') ?? '/cart');
             // } else {
@@ -134,11 +155,15 @@ export default function CreateRecipient() {
           console.log(error);
           setMessage('Something went wrong. Please try again later.');
         });
+      setIsLoading(false);
     } else {
       try {
         dispatchRecipients({
           type: 'ADD_RECIPIENT',
           payload,
+        });
+        toast.success('Recipient created.', {
+          position: toast.POSITION.BOTTOM_LEFT,
         });
 
         // if (searchParams?.has('return_url')) {
@@ -150,6 +175,7 @@ export default function CreateRecipient() {
         console.log(error);
         setMessage('Something went wrong. Please try again later.');
       }
+      setIsLoading(false);
     }
   };
 
@@ -244,8 +270,10 @@ export default function CreateRecipient() {
                   type='submit'
                   className={styles.actionButton}
                   value='Create Recipient'
+                  disabled={isLoading}
                 />
               </div>
+              {isLoading && <CircularProgress size={24} color='success' />}
               {/* <div>
                   <p>
                     <Link href='/select-recipient'>

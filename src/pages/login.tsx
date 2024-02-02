@@ -6,6 +6,7 @@ import { IRecipient } from '@/types';
 import { TextField, InputAdornment, IconButton } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import mixpanel from 'mixpanel-browser';
 import styles from '../styles/page.module.css';
@@ -31,6 +32,7 @@ export default function Signin(): JSX.Element {
   const { useremail } = query;
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -52,20 +54,23 @@ export default function Signin(): JSX.Element {
   // 'Please enter a valid email address.'
   const submitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsLoading(true);
     setMessage(null);
 
     const email = event.currentTarget.email.value.trim();
     const password = event.currentTarget.password.value.trim();
 
-    mixpanel.track('Login');
+    mixpanel.track('Login Attempt');
 
     if (email === '' || password === '') {
       setMessage('Email and password are required');
+      setIsLoading(false);
       return;
     }
 
     if (hackyRegex.test(email) || hackyRegex.test(password)) {
       setMessage('Invalid text. Please try again.');
+      setIsLoading(false);
       return;
     }
 
@@ -92,47 +97,14 @@ export default function Signin(): JSX.Element {
           payload: response.data.user,
         });
 
-        if (recipients.length > 0) {
-          const payload: IRecipient = {
-            name: recipients[0].name,
-            surname: recipients[0].surname,
-            country: recipients[0].country,
-            countryCode: recipients[0].countryCode,
-            mobileNumber: recipients[0].mobileNumber,
-            email: recipients[0].email ?? '',
-            electricityMeterNumber: recipients[0].electricityMeterNumber ?? '',
-            senderId: response.data.user.id,
-            active: recipients[0].active,
-            id: recipients[0].id,
-          };
+        setIsLoading(false);
 
-          mixpanel.track('Create Recipient from pre-login');
-
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/register`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(payload),
-            }
-          ).catch((error) => {
-            console.log('error', error);
-          });
-        }
-
-        const url = `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/recipients?userId=${response.data.user.id}`;
-        try {
-          const response2 = await axios.get(url);
-          // console.log('start adding recipients');
-          dispatchRecipients({
-            type: 'ADD_RECIPIENTS',
-            payload: response2.data['recipients'],
-          });
-        } catch (error) {
-          console.log('error', error);
-        }
+        // Run settleRecipients in a separate async operation
+        settleRecipients(response.data.user).catch((error) => {
+          console.error('Failed to settle recipients:', error);
+          // Handle the failure of settleRecipients here
+          // This could be showing a notification, logging the error, etc.
+        });
       }
 
       mixpanel.identify(response.data.user.email);
@@ -149,6 +121,48 @@ export default function Signin(): JSX.Element {
         setMessage('Something went wrong. Please try again later.');
       }
       console.log('catch', error);
+      setIsLoading(false);
+    }
+  };
+
+  const settleRecipients = async (user: any) => {
+    if (recipients.length > 0) {
+      const payload: IRecipient = {
+        name: recipients[0].name,
+        surname: recipients[0].surname,
+        country: recipients[0].country,
+        countryCode: recipients[0].countryCode,
+        mobileNumber: recipients[0].mobileNumber,
+        email: recipients[0].email ?? '',
+        electricityMeterNumber: recipients[0].electricityMeterNumber ?? '',
+        senderId: user.id,
+        active: recipients[0].active,
+        id: recipients[0].id,
+      };
+
+      mixpanel.track('Create Recipient from pre-login');
+
+      await fetch(`${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      }).catch((error) => {
+        console.log('error', error);
+      });
+    }
+
+    const url = `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/recipients?userId=${user.id}`;
+    try {
+      const response2 = await axios.get(url);
+      // console.log('start adding recipients');
+      dispatchRecipients({
+        type: 'ADD_RECIPIENTS',
+        payload: response2.data['recipients'],
+      });
+    } catch (error) {
+      console.log('error', error);
     }
   };
 
@@ -213,12 +227,17 @@ export default function Signin(): JSX.Element {
                   type='submit'
                   className={styles.actionButton}
                   value='Sign In'
+                  disabled={isLoading}
                 />
-                <div>
-                  <p>
-                    New on Lipaworld? <Link href='/register'>Join Now</Link>.
-                  </p>
-                </div>
+                {isLoading ? (
+                  <CircularProgress size={24} color='success' />
+                ) : (
+                  <div>
+                    <p>
+                      New on Lipaworld? <Link href='/register'>Join Now</Link>.
+                    </p>
+                  </div>
+                )}
               </div>
             </form>
           </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 import mobileDetect from 'mobile-detect';
 import {
   useDispatchCart,
@@ -261,8 +262,22 @@ export default function CartContainer() {
     }
   };
 
+  useEffect(() => {
+    const url = `${process.env.NEXT_PUBLIC_API_CONFIGURATIONS_URL}/v1/transactions/transactionid`;
+    axios.post(url).then((response) => {
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem('transactionId', response.data.transactionId);
+      }
+      dispatchTransaction({
+        type: 'SET_TRANSACTION_ID',
+        payload: response.data.transactionId,
+      });
+    });
+  }, []);
+
   const checkoutHandler = () => {
     sessionStorage.setItem('cart', JSON.stringify(cart));
+
     sessionStorage.setItem('transaction', JSON.stringify(transaction));
 
     updateTransactionAmounts(
@@ -280,7 +295,6 @@ export default function CartContainer() {
     if (!name) {
       router.push(
         `/login?return_url=/payment?${searchParams && searchParams.toString()}`
-        // `/login`
       );
       return;
     }
