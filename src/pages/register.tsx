@@ -64,7 +64,7 @@ export default function Register(): JSX.Element {
     'makhotsor@gmail.com',
     'merel.vanderlei@wyzetalk.com',
     'ntlakulasesing@gmail.com',
-    'avumile@wharton.upenn.edu',
+    'avumile@wharton.upenn.edu','rrvwork27@gmail.com',
 'nikita1lledo@gmail.com',
 'mihuvhom@gmail.com',
 'simryn.dejager@cba.com.au'
