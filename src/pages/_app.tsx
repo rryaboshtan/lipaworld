@@ -13,7 +13,8 @@ import {
   UserProvider,
   VouchersProvider,
   TransactionProvider,
-} from '@/context/index';
+  ListsProvider,
+  } from '@/context/index';
 
 import '@/styles/globals.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -54,25 +55,29 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <QueryClientProvider client={queryClient}>
+        {/* <GoogleFontsLayout> */}
         <UserProvider>
           <CountriesProvider>
             <MerchantsProvider>
               <RecipientsProvider>
-                <VouchersProvider>
-                  <TransactionProvider>
-                    <CartProvider>
-                      <PayPalScriptProvider options={initialOptions}>
-                        <Component {...pageProps} />
-                      </PayPalScriptProvider>
-                    </CartProvider>
-                  </TransactionProvider>
-                </VouchersProvider>
+                <ListsProvider>
+                  <VouchersProvider>
+                    <TransactionProvider>
+                      <CartProvider>
+                        <PayPalScriptProvider options={initialOptions}>
+                          <Component {...pageProps} />
+                        </PayPalScriptProvider>
+                      </CartProvider>
+                    </TransactionProvider>
+                  </VouchersProvider>
+                </ListsProvider>
               </RecipientsProvider>
             </MerchantsProvider>
           </CountriesProvider>
         </UserProvider>
+        {/* </GoogleFontsLayout> */}
       </QueryClientProvider>
-      <Script
+            <Script
         id='gtm'
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />

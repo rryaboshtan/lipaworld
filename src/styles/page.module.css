@@ -317,7 +317,7 @@ a.actionLink,
   height: 100%;
 }
 
-.dealHolder {
+.dealHolder, .listsHolder {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -325,6 +325,10 @@ a.actionLink,
   flex-wrap: wrap;
   margin-bottom: 2rem;
   width: 100%;
+}
+
+.listsHolder {
+  gap: 24px;
 }
 
 .dealMerchant {
@@ -389,7 +393,7 @@ a.actionLink,
 
 .errorMessage {
   color: red;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   margin-top: 0.25rem;
 }
 

@@ -51,7 +51,6 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
   }, [isAuthed, user]);
 
   const toggleMenu = () => {
-    console.log('toggleMenu');
     setIsOpen(!isOpen);
   };
 
@@ -120,17 +119,17 @@ const Nav: React.FC<NavProps> = ({ withCart }) => {
         <br />
         {!isAuthed && (
           <>
-            <Link href='/register' onClick={() => setIsOpen(false)}>
+            <Link href="/register" onClick={() => setIsOpen(false)}>
               &gt; Register
             </Link>
-            <Link href='/login' onClick={() => setIsOpen(false)}>
+            <Link href="/login" onClick={() => setIsOpen(false)}>
               &gt; Login
             </Link>
           </>
         )}
         {isAuthed && (
           <>
-            <Link href='/user-settings' onClick={() => setIsOpen(false)}>
+            <Link href="/user-settings" onClick={() => setIsOpen(false)}>
               &gt; My Account
             </Link>
           </>

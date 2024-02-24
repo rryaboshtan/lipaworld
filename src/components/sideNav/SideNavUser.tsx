@@ -15,9 +15,14 @@ const SideNavUser = () => {
             <li>{user.name}</li>
           </Link>
         ) : (
-          <Link href={`/login`}>
-            <li>Login</li>
-          </Link>
+          <>
+            <Link href={`/login`}>
+              <li>Login</li>
+            </Link>
+            <Link href={`/register`}>
+              <li>Register</li>
+            </Link>
+          </>
         )}
         {/* <li>
       <Link href={`/voucher-history`}>Voucher History</Link>
@@ -32,6 +37,17 @@ const SideNavUser = () => {
         )}
         <Link href={`/create-recipient`}>
           <li>Create Recipient</li>
+        </Link>
+      </ul>
+      <div className={styles.title}>Wish lists</div>
+      <ul className={styles.navList}>
+        {user && (
+          <Link href={`/my-lists`}>
+            <li>My lists</li>
+          </Link>
+        )}
+        <Link href={`/create-list`}>
+          <li>Create list</li>
         </Link>
       </ul>
     </>

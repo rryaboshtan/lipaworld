@@ -10,6 +10,7 @@ import {
   useRecipients,
   useDispatchRecipients,
 } from './RecipientsContext';
+import { ListsProvider, useLists, useDispatchLists } from './ListsContext';
 import {
   CountriesProvider,
   useCountries,
@@ -39,6 +40,9 @@ export {
   RecipientsProvider,
   useRecipients,
   useDispatchRecipients,
+  ListsProvider,
+  useLists,
+  useDispatchLists,
   CountriesProvider,
   useCountries,
   useDispatchCountries,

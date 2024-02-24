@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useVouchers, useCountries, useRecipients } from '@/context';
 import { IVoucher, ICountry } from '@/types';
-import SideNav from '../components/sideNav/SideNav';
-import NavMobile from '../components/navMobile/NavMobile';
+import SideNav from '../../../components/sideNav/SideNav';
+import NavMobile from '../../../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
 const montserrat = Montserrat({ subsets: ['latin'] });
-import styles from '../styles/page.module.css';
+import styles from '../../../styles/page.module.css';
 import VoucherCard from '@components/voucherCard/VoucherCard';
 
 export default function SelectDeal() {

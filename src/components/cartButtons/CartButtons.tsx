@@ -1,10 +1,11 @@
-import React, { Dispatch } from 'react';
+import React, { Dispatch, useState } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
-import { useUser } from '@/context';
+import { useDispatchLists, useLists, useUser } from '@/context';
 import { useDispatchCart } from '@/context';
-import { IVoucher, IRecipient } from '@/types';
+import { IVoucher, IRecipient, IList } from '@/types';
 import styles from './CartButtons.module.scss';
+import { MenuItem, Select } from '@mui/material';
 
 interface ICartButtonsProps {
   deal: IVoucher;
@@ -24,9 +25,13 @@ function CartButtons({
   productRecipient,
   setProductRecipient,
 }: ICartButtonsProps) {
+  const dispatchLists = useDispatchLists();
   const dispatchCart = useDispatchCart();
   const user = useUser();
   const router = useRouter();
+  const lists = useLists();
+
+  const [choosedList, setChoosedList] = useState('Add to wish list');
 
   const readyForCart = user?.name && productRecipient;
 
@@ -69,26 +74,111 @@ function CartButtons({
     router.push(`/cart`);
   };
 
+  const listItemClick = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    list: IList
+  ) => {
+    dispatchLists({
+      type: 'ADD_VOUCHER_TO_LIST',
+      payload: { id: list.id, voucher: deal },
+    });
+
+    toast.success(`Voucher was added to list ${list.listName}`, {
+      position: toast.POSITION.BOTTOM_LEFT,
+    });
+
+    // fetch(`${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/add-voucher-to-list`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(list.id),
+    // })
+    //   .then((response: any) => {
+    //     if (response.ok) {
+    //       dispatchLists({
+    //         type: 'DELETE_LIST',
+    //         payload: list.listName,
+    //       })
+
+    //       toast.success('List created.', {
+    //         position: toast.POSITION.BOTTOM_LEFT,
+    //       })
+
+    //       router.push('/select-deal?recipientCountryCode=ZA&category=Shopping')
+    //     }
+    //   })
+    //   .catch((error: unknown) => {
+    //     setMessage('Something went wrong. Please try again later.')
+    //   })
+  };
+
   return (
     <div className={styles.cartHolder}>
-      {isHistory && (
-        <button className={styles.cart} onClick={() => resendHandler()}>
-          Resend
-        </button>
-      )}
-      {deal.status === 'OutOfStock' ? (
-        <button className={styles.cart} disabled>
-          Out of stock
-        </button>
-      ) : (
-        <button
-          className={styles.cart}
-          onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
-          // disabled={!readyForCart}
+      <div>
+        {isHistory && (
+          <button className={styles.cart} onClick={() => resendHandler()}>
+            Resend
+          </button>
+        )}
+        {deal.status === 'OutOfStock' ? (
+          <button className={styles.cart} disabled>
+            Out of stock
+          </button>
+        ) : (
+          <button
+            className={styles.cart}
+            onClick={() => addtoCartHandler(deal, deal.redemptionValues[0])}
+            // disabled={!readyForCart}
+          >
+            Add to Cart
+          </button>
+        )}
+      </div>
+      {/* {user && ( */}
+      <div className={styles.listNames}>
+        <Select
+          sx={{ width: '150px', height: '36px', fontSize: '13.3px' }}
+          aria-labelledby="Add to wish list"
+          name="addToWishList"
+          value={choosedList}
+          onChange={(e) => setChoosedList(e.target.value)}
+          required
+          style={{ backgroundColor: '#ffffff' }}
         >
-          Add to Cart
-        </button>
-      )}
+          <MenuItem sx={{ fontSize: '13.3px' }} value="Add to wish list">
+            Add to wish list
+          </MenuItem>
+          {lists.map((list, index) => (
+            <MenuItem
+              sx={{ width: '150px', fontSize: '13.3px' }}
+              key={index}
+              value={list.listName}
+              onClick={(e) => listItemClick(e, list)}
+            >
+              {list.listName}
+            </MenuItem>
+          ))}
+
+          <MenuItem
+            sx={{
+              fontSize: '13.3px',
+              display: 'flex',
+              gap: '4px',
+              alignItems: 'center',
+            }}
+            value="Create list"
+            onClick={() => router.push('/create-list')}
+          >
+            <div className={styles.createList}>
+              {/* <Image src={plus} alt="Plus" /> */}
+              <div>+</div>
+              <div>Create list</div>
+            </div>
+          </MenuItem>
+        </Select>
+      </div>
+      {/* )} */}
     </div>
   );
 }

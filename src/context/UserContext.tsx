@@ -6,7 +6,7 @@ import {
   Dispatch,
 } from 'react';
 
-interface IUser {
+export interface IUser {
   id?: string;
   name: string;
   surname: string;

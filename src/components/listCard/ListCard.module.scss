@@ -1,0 +1,121 @@
+.container {
+  -webkit-text-size-adjust: 100%;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #111;
+  -webkit-box-direction: normal;
+  -webkit-font-smoothing: inherit;
+  font-family: inherit;
+  text-rendering: auto;
+  letter-spacing: normal;
+  word-spacing: normal;
+  background: #ffffff;
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.08), 0 4px 24px 0 rgba(0, 0, 0, 0.04);
+  border: 0 solid transparent;
+  border-radius: 0.5rem;
+  padding: 20px;
+  // padding: 24px 16px;
+  // margin: 12px;
+  width: 100%;
+  position: relative;
+  height: 100%;
+
+  &:hover {
+    box-shadow: 0 4px 24px 0 rgba(15, 188, 73, 0.4), 0 4px 8px 0 rgba(15, 188, 73, 0.2);
+    cursor: pointer;
+  }
+}
+
+.wrapper {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.listName {
+  font-size: 18px;
+  line-height: 25px;
+  font-weight: 600;
+}
+
+.settings {
+  font-size: 14px;
+  line-height: 25px;
+  cursor: pointer;
+  position: relative;
+  color: #111111;
+
+  &:after {
+    content: '';
+    height: 1px;
+    width: 100%;
+    background-color: #111111;
+    position: absolute;
+    left: 0;
+    top: 22px;
+  }
+}
+
+.content {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mainInfo {
+  display: flex;
+  gap: 40px;
+}
+
+.field {
+  font-size: 14px;
+  line-height: 25px;
+  font-weight: 300;
+}
+
+.name {
+  font-size: 14px;
+  line-height: 25px;
+  color: #0fbc49;
+}
+
+.deleteIcon {
+  padding-top: 16px;
+}
+
+.footer {
+  padding-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.access {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px;
+  border: 1px solid #0000001a;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.shareList {
+  width: 137px;
+  height: 48px;
+  // padding: 3.5px, 32px, 4.5px, 32px;
+  border-radius: 8px;
+  background: #0fbc49;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+}

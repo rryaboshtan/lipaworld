@@ -7,6 +7,9 @@ import type { ICountry } from './ICountry';
 import type { ICartItem } from './ICart';
 import type { ICart } from './ICart';
 import type { IRecipient } from './IRecipient';
+import type { IList } from './IList';
+import type { ListType } from './IList';
+import type { AccessParameter } from './IList';
 
 export type {
   IMerchant,
@@ -16,5 +19,8 @@ export type {
   ICartItem,
   ICart,
   IRecipient,
+  IList,
+  ListType,
+  AccessParameter,
 };
 export { ERetailStatus, ERedemptionStatus };
