@@ -14,7 +14,7 @@ import {
   VouchersProvider,
   TransactionProvider,
   ListsProvider,
-  } from '@/context/index';
+} from '@/context/index';
 
 import '@/styles/globals.css';
 import { config } from '@fortawesome/fontawesome-svg-core';
@@ -55,7 +55,6 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        {/* <GoogleFontsLayout> */}
         <UserProvider>
           <CountriesProvider>
             <MerchantsProvider>
@@ -75,9 +74,8 @@ export default function App({ Component, pageProps }: AppProps) {
             </MerchantsProvider>
           </CountriesProvider>
         </UserProvider>
-        {/* </GoogleFontsLayout> */}
       </QueryClientProvider>
-            <Script
+      <Script
         id='gtm'
         src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GTM}`}
       />

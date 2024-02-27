@@ -37,6 +37,10 @@ type ListsAction =
       payload: { id: string; voucher: IVoucher }; // The existing list data
     }
   | {
+      type: 'DELETE_VOUCHER_FROM_LIST';
+      payload: { listName: string; dealId: string }; // The existing list data
+    }
+  | {
       type: 'SELECT_LIST';
       payload: IList; // The selected list data
     }
@@ -92,9 +96,8 @@ const reducer = (state: ListsState, action: ListsAction) => {
       }
       return [...lists, ...state];
 
-    case 'ADD_VOUCHER_TO_LIST':
-      console.log('2222222222222222222222222');
-      let index = state.findIndex((list) => list.id === action.payload.id);
+    case 'ADD_VOUCHER_TO_LIST': {
+      const index = state.findIndex((list) => list.id === action.payload.id);
       const voucherIndex = state[index].vouchers.findIndex(
         (voucher) => voucher.dealId === action.payload.voucher.dealId
       );
@@ -103,9 +106,9 @@ const reducer = (state: ListsState, action: ListsAction) => {
       }
       // console.log("action.payload.voucher = ", action.payload.voucher)
       return state;
-
+    }
     case 'UPDATE_LIST':
-      index = state.findIndex((list) => list.id === action.payload.id);
+      const index = state.findIndex((list) => list.id === action.payload.id);
       state[index] = action.payload;
       return state;
     // case 'SELECT_RECIPIENT':
@@ -123,6 +126,19 @@ const reducer = (state: ListsState, action: ListsAction) => {
     //   } else {
     //     return state;
     //   }
+
+    case 'DELETE_VOUCHER_FROM_LIST': {
+      const index = state.findIndex(
+        (list) => list.listName === action.payload.listName
+      );
+      state[index].vouchers = state[index].vouchers.filter(
+        (voucher) => voucher.dealId !== action.payload.dealId
+      );
+      return [...state];
+      // TODO: Add some logic to delete the list from a database or an API
+      // Return a new state with the list filtered out by id from the array
+      // return state.filter((r) => r.listName !== action.payload);
+    }
     case 'DELETE_LIST':
       // TODO: Add some logic to delete the list from a database or an API
       // Return a new state with the list filtered out by id from the array

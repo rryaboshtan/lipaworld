@@ -5,7 +5,9 @@ import { useDispatchLists, useLists, useUser } from '@/context';
 import { useDispatchCart } from '@/context';
 import { IVoucher, IRecipient, IList } from '@/types';
 import styles from './CartButtons.module.scss';
-import { MenuItem, Select } from '@mui/material';
+import { CircularProgress, MenuItem, Select } from '@mui/material';
+import Image from 'next/image';
+import deleteIcon from '../../../public/img/delete.svg';
 
 interface ICartButtonsProps {
   deal: IVoucher;
@@ -29,8 +31,12 @@ function CartButtons({
   const dispatchCart = useDispatchCart();
   const user = useUser();
   const router = useRouter();
+  const { asPath, query } = router;
+  const { listName } = query;
   const lists = useLists();
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
   const [choosedList, setChoosedList] = useState('Add to wish list');
 
   const readyForCart = user?.name && productRecipient;
@@ -113,6 +119,47 @@ function CartButtons({
     //   })
   };
 
+  const onDelete = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setIsLoading(true);
+    // setMessage(null)
+
+    dispatchLists({
+      type: 'DELETE_VOUCHER_FROM_LIST',
+      payload: { listName: listName as string, dealId: deal.dealId },
+    });
+
+    toast.success(`Voucher ${deal.voucherName} deleted from list.`, {
+      position: toast.POSITION.BOTTOM_LEFT,
+    });
+
+    // fetch(`${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/delete-list`, {
+    //   method: 'DELETE',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(list.id),
+    // })
+    //   .then((response: any) => {
+    //     if (response.ok) {
+    //       dispatchLists({
+    //         type: 'DELETE_LIST',
+    //         payload: list.listName,
+    //       })
+
+    //       toast.success(`Recipient ${deal.voucherName} deleted from list.`, {
+    //          position: toast.POSITION.BOTTOM_LEFT,
+    //       });
+
+    //       router.push('/select-deal?recipientCountryCode=ZA&category=Shopping')
+    //     }
+    //   })
+    //   .catch((error: unknown) => {
+    //     setMessage('Something went wrong. Please try again later.')
+    //   })
+    setIsLoading(false);
+  };
+
   return (
     <div className={styles.cartHolder}>
       <div>
@@ -136,49 +183,57 @@ function CartButtons({
         )}
       </div>
       {/* {user && ( */}
-      <div className={styles.listNames}>
-        <Select
-          sx={{ width: '150px', height: '36px', fontSize: '13.3px' }}
-          aria-labelledby="Add to wish list"
-          name="addToWishList"
-          value={choosedList}
-          onChange={(e) => setChoosedList(e.target.value)}
-          required
-          style={{ backgroundColor: '#ffffff' }}
-        >
-          <MenuItem sx={{ fontSize: '13.3px' }} value="Add to wish list">
-            Add to wish list
-          </MenuItem>
-          {lists.map((list, index) => (
-            <MenuItem
-              sx={{ width: '150px', fontSize: '13.3px' }}
-              key={index}
-              value={list.listName}
-              onClick={(e) => listItemClick(e, list)}
-            >
-              {list.listName}
-            </MenuItem>
-          ))}
-
-          <MenuItem
-            sx={{
-              fontSize: '13.3px',
-              display: 'flex',
-              gap: '4px',
-              alignItems: 'center',
-            }}
-            value="Create list"
-            onClick={() => router.push('/create-list')}
+      {asPath.includes('my-list') ? (
+        <div className={styles.deleteIcon} onClick={onDelete}>
+          <Image src={deleteIcon} alt="delete icon" />
+        </div>
+      ) : (
+        <div className={styles.listNames}>
+          <Select
+            sx={{ width: '150px', height: '36px', fontSize: '13.3px' }}
+            aria-labelledby="Add to wish list"
+            name="addToWishList"
+            value={choosedList}
+            onChange={(e) => setChoosedList(e.target.value)}
+            required
+            style={{ backgroundColor: '#ffffff' }}
           >
-            <div className={styles.createList}>
-              {/* <Image src={plus} alt="Plus" /> */}
-              <div>+</div>
-              <div>Create list</div>
-            </div>
-          </MenuItem>
-        </Select>
-      </div>
-      {/* )} */}
+            <MenuItem sx={{ fontSize: '13.3px' }} value="Add to wish list">
+              Add to wish list
+            </MenuItem>
+            {lists.map((list, index) => (
+              <MenuItem
+                sx={{ width: '150px', fontSize: '13.3px' }}
+                key={index}
+                value={list.listName}
+                onClick={(e) => listItemClick(e, list)}
+              >
+                {list.listName}
+              </MenuItem>
+            ))}
+
+            <MenuItem
+              sx={{
+                fontSize: '13.3px',
+                display: 'flex',
+                gap: '4px',
+                alignItems: 'center',
+              }}
+              value="Create list"
+              onClick={() => router.push('/create-list')}
+            >
+              <div className={styles.createList}>
+                {/* <Image src={plus} alt="Plus" /> */}
+                <div>+</div>
+                <div>Create list</div>
+              </div>
+            </MenuItem>
+          </Select>
+        </div>
+      )}
+
+      {message && <p className={styles.errorMessage}>{message}</p>}
+      {isLoading && <CircularProgress size={24} color="success" />}
     </div>
   );
 }

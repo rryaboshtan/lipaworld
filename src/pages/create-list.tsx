@@ -19,7 +19,7 @@ import NavMobile from '../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
 // import PhoneForm from '../components/phoneInput/PhoneInput'
 
-import styles from '../../styles/page.module.css';
+import styles from '../styles/page.module.css';
 import { AccessParameter, IList, ListType } from '@/types';
 
 const montserrat = Montserrat({ subsets: ['latin'] });

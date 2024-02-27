@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { useLists, useUser } from '@/context';
-import { useDispatchRecipients, useRecipients } from '@/context';
+import { useDispatchLists, useLists, useUser } from '@/context';
+import { useRecipients } from '@/context';
 import SideNav from '../../components/sideNav/SideNav';
 import NavMobile from '../../components/navMobile/NavMobile';
 import { Montserrat } from 'next/font/google';
 import styles from '../../styles/page.module.css';
-import RecipientCard from '@components/recipientCard/RecipientCard';
-import { IRecipient } from '@/types';
+import { IList } from '@/types';
 import ListCard from '@/components/listCard/ListCard';
 
 const montserrat = Montserrat({ subsets: ['latin'] });
@@ -19,56 +18,53 @@ export default function MyLists() {
   const [isLoading, setIsLoading] = useState(false);
   const lists = useLists();
   const recipients = useRecipients();
-  const dispatchRecipients = useDispatchRecipients();
+  const dispatchLists = useDispatchLists();
 
   const router = useRouter();
   const user = useUser();
 
-  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(
-    null
-  );
-
   useEffect(() => {
-    const params: URLSearchParams = new URLSearchParams(window.location.search);
-    setSearchParams(params);
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    if (user?.id && lists.length === 0) {
-      setIsLoading(true);
-      fetch(
-        `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/lists?userId=${user.id}`
-      )
-        .then((res) => res.json())
-        .then((res: { lists: IRecipient[] }) => {
-          if (isMounted && res.lists.length > 0) {
-            dispatchRecipients({
-              type: 'ADD_RECIPIENTS',
-              payload: res.lists,
-            });
-            setIsLoading(false);
-          }
-        })
-        .catch((error: any) => {
-          console.log(error);
-          if (isMounted) {
-            setErrorMessage('Something went wrong. Please try again later.');
-            setIsLoading(false);
-          }
-        });
-    } else {
-      setIsLoading(false);
+    if (!user) {
+      router.push('/login');
     }
+  }, [user]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // useEffect(() => {
+  //   let isMounted = true;
 
-  const createRecipientHandler = () => {
-    router.push(`/create-list/?${searchParams && searchParams.toString()}`);
+  //   if (user?.id && lists.length === 0) {
+  //     setIsLoading(true);
+  //     fetch(
+  //       `${process.env.NEXT_PUBLIC_API_RECIPIENTS_URL}/lists?userId=${user.id}`
+  //     )
+  //       .then((res) => res.json())
+  //       .then((res: { lists: IList[] }) => {
+  //         if (isMounted && res.lists.length > 0) {
+  //           dispatchLists({
+  //             type: 'ADD_LISTS',
+  //             payload: res.lists,
+  //           });
+  //           setIsLoading(false);
+  //         }
+  //       })
+  //       .catch((error: any) => {
+  //         console.log(error);
+  //         if (isMounted) {
+  //           setErrorMessage('Something went wrong. Please try again later.');
+  //           setIsLoading(false);
+  //         }
+  //       });
+  //   } else {
+  //     setIsLoading(false);
+  //   }
+
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, []);
+
+  const onCreateList = () => {
+    router.push('/create-list');
   };
 
   return (
@@ -103,17 +99,17 @@ export default function MyLists() {
                 </Link>
               </div>
             )}
+            <div className={styles.contentFooter}>
+              {lists.length > 0 && (
+                <input
+                  type="button"
+                  className={`${styles.actionButton} ${styles.mediumEmphasis}`}
+                  value="Create new list"
+                  onClick={onCreateList}
+                />
+              )}
+            </div>
           </div>
-        </div>
-        <div className={styles.contentFooter}>
-          {lists.length > 0 && (
-            <input
-              type="button"
-              className={`${styles.actionButton} ${styles.mediumEmphasis}`}
-              value="Create new list"
-              onClick={createRecipientHandler}
-            />
-          )}
         </div>
       </div>
     </main>

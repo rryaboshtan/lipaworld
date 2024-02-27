@@ -65,7 +65,7 @@ const ListCard: React.FC<Props> = ({ list, recipient }) => {
   return (
     <div
       className={styles.container}
-      onMouseEnter={() => console.log(list.listName)}
+      onClick={() => router.push(`/my-lists/${list.listName}`)}
     >
       <div className={styles.wrapper}>
         <div className={styles.header}>
